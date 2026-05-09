@@ -122,7 +122,12 @@ public class StaffDashboard {
 		} else if (!isAddingMode[0] && btn.getText().equals("Booked")) {
 			app.systemTimeSlots.removeIf(s -> s.getTimeRange().equals(range));
 		}
-		app.updateStudentUIList();
+
+		app.updateStudentUIList(); // This now automatically runs your BST!
+
+		// TASK T3: Save state to text file instantly
+		main.DataManager.saveState(app.systemTimeSlots);
+
 		updateButtonStyle(btn, range);
 	}
 

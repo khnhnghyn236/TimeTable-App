@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import users.Student;
 
-public class TimeSlot {
+public class TimeSlot implements Comparable<TimeSlot> {
 	private String timeRange;
 	private Resource resource;
 
@@ -25,6 +25,10 @@ public class TimeSlot {
 
 	public String getTimeRange() {
 		return timeRange;
+	}
+
+	public Resource getResource() {
+		return resource;
 	}
 
 	public void bookSlot(Student student) {
@@ -76,5 +80,13 @@ public class TimeSlot {
 				System.out.println("AUTO-ASSIGN: Slot given to waitlisted student -> " + nextInLine.getName());
 			}
 		}
+	}
+
+	@Override
+	public int compareTo(TimeSlot other) {
+		// Since your timeRange strings are formatted chronologically
+		// (e.g., "2026-04-29 | 10:00 - 10:30"), standard string comparison works
+		// perfectly!
+		return this.timeRange.compareTo(other.getTimeRange());
 	}
 }
