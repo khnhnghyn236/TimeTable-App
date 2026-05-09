@@ -89,4 +89,8 @@ public class TimeSlot implements Comparable<TimeSlot> {
 		// perfectly!
 		return this.timeRange.compareTo(other.getTimeRange());
 	}
+
+	public List<Student> getConfirmedStudents() {
+		return confirmedStudents;
+	}
 }

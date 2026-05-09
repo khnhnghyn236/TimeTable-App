@@ -3,11 +3,13 @@ package main;
 import javafx.application.Application;
 import javafx.collections.*;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import gui.*;
 import users.*;
 import scheduling.*;
-import datastructures.*; // Make sure this is imported!
+import datastructures.*;
 import java.time.*;
 import java.util.*;
 
@@ -18,8 +20,9 @@ public class AppSchedulerGUI extends Application {
 	public ObservableList<String> uiSlotList = FXCollections.observableArrayList();
 	public Resource activeResource = new Resource("General Office", 2);
 
-	// --- TASK T6: Custom Hash Map for O(1) User Lookups ---
+	// User Databases
 	public CustomHashMap<String, User> userDatabase = new CustomHashMap<>();
+	public ObservableList<User> pendingUsers = FXCollections.observableArrayList(); // For the Admin to approve
 
 	public Student currentStudent;
 	public AcademicStaff currentStaff;
@@ -32,22 +35,34 @@ public class AppSchedulerGUI extends Application {
 		this.window = primaryStage;
 		window.setTitle("TimeTable - Appointment Scheduling Platform");
 
-		// Populate Hash Map Database
-		userDatabase.put("V202502059", new Student("V202502059", "Truong Ba Ky"));
-		userDatabase.put("P001", new AcademicStaff("P001", "Prof. Bob"));
-		userDatabase.put("A001", new Administrator("A001", "Admin Alice"));
+		// 1. Populate Hash Map Database with NEW constructors (ID, Name, Email,
+		// Password)
+		Student testStudent = new Student("V202502059", "Truong Ba Ky", "ky@vinuni.edu", "pass123");
+		testStudent.setApproved(true); // Pre-approve test user
+		userDatabase.put("V202502059", testStudent);
 
-		// Fast O(1) Lookups to set current session users
-		currentStudent = (Student) userDatabase.get("V202502059");
-		currentStaff = (AcademicStaff) userDatabase.get("P001");
-		currentAdmin = (Administrator) userDatabase.get("A001");
+		AcademicStaff testStaff = new AcademicStaff("P001", "Prof. Bob", "bob@vinuni.edu", "pass123");
+		testStaff.setApproved(true); // Pre-approve test user
+		userDatabase.put("P001", testStaff);
 
-		// Load Persisted Data on Startup
+		Administrator testAdmin = new Administrator("A001", "Admin Alice", "alice@vinuni.edu", "admin123");
+		userDatabase.put("A001", testAdmin);
+
+		// --- Load Persisted Data ---
 		systemTimeSlots = DataManager.loadState();
 		updateStudentUIList();
 
 		showLogin();
 		window.show();
+	}
+
+	public boolean confirmAction(String title, String message) {
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		Optional<ButtonType> result = alert.showAndWait();
+		return result.isPresent() && result.get() == ButtonType.OK;
 	}
 
 	public void updateStudentUIList() {
@@ -116,6 +131,10 @@ public class AppSchedulerGUI extends Application {
 
 	public void showStaff() {
 		switchScreen(new Scene(new StaffDashboard(this).getContent(), 950, 750));
+	}
+
+	public void showSignUp() {
+		switchScreen(new Scene(new SignUpScreen(this).getContent(), 450, 500));
 	}
 
 	public static void main(String[] args) {
