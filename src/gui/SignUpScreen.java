@@ -25,7 +25,6 @@ public class SignUpScreen {
 		Label title = new Label("Create an Account");
 		title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-		// Form Fields
 		TextField nameInput = new TextField();
 		nameInput.setPromptText("Full Name");
 
@@ -54,31 +53,43 @@ public class SignUpScreen {
 		btnBack.setOnAction(e -> app.showLogin());
 
 		btnSubmit.setOnAction(e -> {
-			String id = idInput.getText();
-			String name = nameInput.getText();
-			String email = emailInput.getText();
+			String id = idInput.getText().trim();
+			String name = nameInput.getText().trim();
+			String email = emailInput.getText().trim();
 			String pass = passInput.getText();
 			String confirm = passConfirm.getText();
 			String role = roleBox.getValue();
 
-			// Validation
-			if (id.isEmpty() || name.isEmpty() || email.isEmpty() || pass.isEmpty() || role == null) {
+			if (id.isEmpty() || name.isEmpty() || email.isEmpty() || pass.isEmpty() || confirm.isEmpty() || role == null) {
 				statusLabel.setText("Please fill in all fields.");
 				statusLabel.setStyle("-fx-text-fill: red;");
 				return;
 			}
+
+			if (id.contains("|") || name.contains("|") || email.contains("|") || pass.contains("|")) {
+				statusLabel.setText("Please do not use the | character.");
+				statusLabel.setStyle("-fx-text-fill: red;");
+				return;
+			}
+
+			if (!email.contains("@")) {
+				statusLabel.setText("Please enter a valid email address.");
+				statusLabel.setStyle("-fx-text-fill: red;");
+				return;
+			}
+
 			if (!pass.equals(confirm)) {
 				statusLabel.setText("Passwords do not match.");
 				statusLabel.setStyle("-fx-text-fill: red;");
 				return;
 			}
+
 			if (app.userDatabase.containsKey(id)) {
 				statusLabel.setText("Account ID already exists.");
 				statusLabel.setStyle("-fx-text-fill: red;");
 				return;
 			}
 
-			// Create User and add to Pending List
 			User newUser;
 			if (role.equals("Student")) {
 				newUser = new Student(id, name, email, pass);
@@ -86,10 +97,8 @@ public class SignUpScreen {
 				newUser = new AcademicStaff(id, name, email, pass);
 			}
 
-			app.userDatabase.put(id, newUser);
-			app.pendingUsers.add(newUser);
+			app.registerNewUser(newUser);
 
-			// Show the "Thank You" success state within the same window
 			layout.getChildren().clear();
 			Label successTitle = new Label("Thank you for signing up!");
 			successTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: green;");

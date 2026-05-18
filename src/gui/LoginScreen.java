@@ -36,8 +36,14 @@ public class LoginScreen {
 				"-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-pref-width: 200px; -fx-cursor: hand;");
 
 		btnLogin.setOnAction(e -> {
-			String id = idInput.getText();
+			String id = idInput.getText().trim();
 			String pass = passInput.getText();
+
+			if (id.isEmpty() || pass.isEmpty()) {
+				warningLabel.setText("Please enter ID and password.");
+				warningLabel.setStyle("-fx-text-fill: red;");
+				return;
+			}
 
 			if (!app.userDatabase.containsKey(id)) {
 				warningLabel.setText("Account does not exist.");
@@ -54,27 +60,33 @@ public class LoginScreen {
 			}
 
 			if (!user.isApproved()) {
-				warningLabel.setText("Admin has not approved yet.");
-				warningLabel.setStyle("-fx-text-fill: #d4a017;"); // Darker yellow for visibility
+				warningLabel.setText("Admin has not approved this account yet.");
+				warningLabel.setStyle("-fx-text-fill: #d4a017;");
 				return;
 			}
 
-			// Route based on role
-			if (user instanceof Student) {
+			if (user instanceof Administrator) {
+				app.currentAdmin = (Administrator) user;
+				app.showAdmin();
+			} else if (user instanceof Student) {
 				app.currentStudent = (Student) user;
 				app.showStudent();
 			} else if (user instanceof AcademicStaff) {
 				app.currentStaff = (AcademicStaff) user;
 				app.showStaff();
+			} else {
+				warningLabel.setText("Unknown account role.");
+				warningLabel.setStyle("-fx-text-fill: red;");
 			}
 		});
 
-		Button btnAdmin = new Button("Login as Admin");
+		Button btnAdmin = new Button("Use Demo Admin Account");
 		btnAdmin.setStyle("-fx-background-color: transparent; -fx-text-fill: #5f6368; -fx-cursor: hand;");
 		btnAdmin.setOnAction(e -> {
-			// Skip authorization for Admin as requested
-			app.currentAdmin = (Administrator) app.userDatabase.get("A001");
-			app.showAdmin();
+			idInput.setText("A001");
+			passInput.setText("admin123");
+			warningLabel.setText("Demo admin filled. Click Login.");
+			warningLabel.setStyle("-fx-text-fill: #5f6368;");
 		});
 
 		Label signupText = new Label("Not a member? Create an account here!");

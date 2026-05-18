@@ -1,4 +1,6 @@
 bin/
 .settings/
 .classpath
-.project
+.projectout/
+out/
+.vscode/

@@ -43,7 +43,7 @@ public class AdminDashboard {
 		requestTab.setContent(createRequestTab());
 
 		tabPane.getTabs().addAll(resourceTab, requestTab);
-		VBox.setVgrow(tabPane, Priority.ALWAYS); // Makes the tabs fill the screen
+		VBox.setVgrow(tabPane, Priority.ALWAYS);
 
 		layout.getChildren().addAll(titleLabel, tabPane, logoutBtn);
 		return layout;
@@ -66,8 +66,20 @@ public class AdminDashboard {
 
 		createBtn.setOnAction(e -> {
 			try {
-				String name = resourceNameInput.getText();
-				int capacity = Integer.parseInt(capacityInput.getText());
+				String name = resourceNameInput.getText().trim();
+				int capacity = Integer.parseInt(capacityInput.getText().trim());
+
+				if (name.isEmpty()) {
+					statusLabel.setText("Status: Error! Resource name cannot be empty.");
+					statusLabel.setStyle("-fx-text-fill: red;");
+					return;
+				}
+
+				if (capacity <= 0) {
+					statusLabel.setText("Status: Error! Capacity must be greater than 0.");
+					statusLabel.setStyle("-fx-text-fill: red;");
+					return;
+				}
 
 				app.activeResource = new Resource(name, capacity);
 				statusLabel.setText("Status: Successfully created " + name);
@@ -114,20 +126,18 @@ public class AdminDashboard {
 					Label userInfo = new Label(user.getName() + " (" + user.getUserId() + ") - Requesting "
 							+ user.getClass().getSimpleName() + " Account");
 					Region spacer = new Region();
-					HBox.setHgrow(spacer, Priority.ALWAYS); // Pushes buttons to the right
+					HBox.setHgrow(spacer, Priority.ALWAYS);
 
 					Button btnApprove = new Button("Approve");
 					btnApprove.setStyle("-fx-background-color: #34a853; -fx-text-fill: white; -fx-cursor: hand;");
-					btnApprove.setOnAction(e -> {
-						user.setApproved(true); // Grant access
-						app.pendingUsers.remove(user); // Remove from the pending queue
-					});
+					btnApprove.setOnAction(e -> app.approveUser(user));
 
 					Button btnDecline = new Button("Decline");
 					btnDecline.setStyle("-fx-background-color: #ea4335; -fx-text-fill: white; -fx-cursor: hand;");
 					btnDecline.setOnAction(e -> {
-						// Remove them completely so they have to sign up again
-						app.pendingUsers.remove(user);
+						if (app.confirmAction("Confirm Decline", "Decline this account request permanently?")) {
+							app.declineUser(user);
+						}
 					});
 
 					row.getChildren().addAll(userInfo, spacer, btnApprove, btnDecline);
