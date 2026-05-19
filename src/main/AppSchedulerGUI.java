@@ -14,130 +14,149 @@ import java.time.*;
 import java.util.*;
 
 public class AppSchedulerGUI extends Application {
-	private Stage window;
+    private Stage window;
 
-	public List<TimeSlot> systemTimeSlots = new ArrayList<>();
-	public ObservableList<String> uiSlotList = FXCollections.observableArrayList();
-	public Resource activeResource = new Resource("General Office", 2);
+    public List<TimeSlot> systemTimeSlots = new ArrayList<>();
+    public ObservableList<String> uiSlotList = FXCollections.observableArrayList();
+    public Resource activeResource = new Resource("General Office", 2);
 
-	// User Databases
-	public CustomHashMap<String, User> userDatabase = new CustomHashMap<>();
-	public ObservableList<User> pendingUsers = FXCollections.observableArrayList(); // For the Admin to approve
+    public CustomHashMap<String, User> userDatabase = new CustomHashMap<>();
+    public ObservableList<User> pendingUsers = FXCollections.observableArrayList();
+    public List<User> allUsers = new ArrayList<>();
 
-	public Student currentStudent;
-	public AcademicStaff currentStaff;
-	public Administrator currentAdmin;
+    public Student currentStudent;
+    public AcademicStaff currentStaff;
+    public Administrator currentAdmin;
 
-	public LocalDate currentWeekStart = LocalDate.now().with(DayOfWeek.MONDAY);
+    public LocalDate currentWeekStart = LocalDate.now().with(DayOfWeek.MONDAY);
 
-	@Override
-	public void start(Stage primaryStage) {
-		this.window = primaryStage;
-		window.setTitle("TimeTable - Appointment Scheduling Platform");
+    @Override
+    public void start(Stage primaryStage) {
+        this.window = primaryStage;
+        window.setTitle("TimeTable - Appointment Scheduling Platform");
 
-		// 1. Populate Hash Map Database with NEW constructors (ID, Name, Email,
-		// Password)
-		Student testStudent = new Student("V202502059", "Truong Ba Ky", "ky@vinuni.edu", "pass123");
-		testStudent.setApproved(true); // Pre-approve test user
-		userDatabase.put("V202502059", testStudent);
+        loadUsersFromStorage();
 
-		AcademicStaff testStaff = new AcademicStaff("P001", "Prof. Bob", "bob@vinuni.edu", "pass123");
-		testStaff.setApproved(true); // Pre-approve test user
-		userDatabase.put("P001", testStaff);
+        systemTimeSlots = DataManager.loadState();
+        updateStudentUIList();
 
-		Administrator testAdmin = new Administrator("A001", "Admin Alice", "alice@vinuni.edu", "admin123");
-		userDatabase.put("A001", testAdmin);
+        showLogin();
+        window.show();
+    }
 
-		// --- Load Persisted Data ---
-		systemTimeSlots = DataManager.loadState();
-		updateStudentUIList();
+    private void loadUsersFromStorage() {
+        allUsers = DataManager.loadUsers();
+        if (allUsers.isEmpty()) {
+            createDefaultUsers();
+            DataManager.saveUsers(allUsers);
+        }
+        rebuildUserDatabase();
+        rebuildPendingUsers();
+    }
 
-		showLogin();
-		window.show();
-	}
+    private void createDefaultUsers() {
+        Student testStudent = new Student("V202502059", "Truong Ba Ky", "ky@vinuni.edu", "pass123");
+        testStudent.setApproved(true);
+        AcademicStaff testStaff = new AcademicStaff("P001", "Prof. Bob", "bob@vinuni.edu", "pass123");
+        testStaff.setApproved(true);
+        Administrator testAdmin = new Administrator("A001", "Admin Alice", "alice@vinuni.edu", "admin123");
+        testAdmin.setApproved(true);
+        allUsers.add(testStudent);
+        allUsers.add(testStaff);
+        allUsers.add(testAdmin);
+    }
 
-	public boolean confirmAction(String title, String message) {
-		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-		alert.setTitle(title);
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		Optional<ButtonType> result = alert.showAndWait();
-		return result.isPresent() && result.get() == ButtonType.OK;
-	}
+    public void registerNewUser(User user) {
+        allUsers.add(user);
+        rebuildUserDatabase();
+        rebuildPendingUsers();
+        DataManager.saveUsers(allUsers);
+    }
 
-	public void updateStudentUIList() {
-		uiSlotList.clear();
-		if (systemTimeSlots.isEmpty())
-			return;
+    public void approveUser(User user) {
+        user.setApproved(true);
+        rebuildPendingUsers();
+        DataManager.saveUsers(allUsers);
+    }
 
-		// Custom BST Sorting Algorithm
-		CustomBST<TimeSlot> bst = new CustomBST<>();
-		for (TimeSlot slot : systemTimeSlots) {
-			bst.insert(slot); // O(log n) insertion
-		}
+    public void declineUser(User user) {
+        allUsers.remove(user);
+        rebuildUserDatabase();
+        rebuildPendingUsers();
+        DataManager.saveUsers(allUsers);
+    }
 
-		// Retrieve chronologically sorted list using In-Order Traversal
-		List<TimeSlot> sortedSlots = bst.getSortedList();
+    public boolean emailExists(String email) {
+        for (User user : allUsers) {
+            if (user.getEmail().equalsIgnoreCase(email)) return true;
+        }
+        return false;
+    }
 
-		String currentDate = null;
-		String currentStart = null;
-		String currentEnd = null;
+    public void rebuildUserDatabase() {
+        userDatabase = new CustomHashMap<>();
+        for (User user : allUsers) userDatabase.put(user.getUserId(), user);
+    }
 
-		for (TimeSlot slot : sortedSlots) {
-			String[] parts = slot.getTimeRange().split(" \\| ");
-			String datePart = parts[0];
-			String[] times = parts[1].split(" - ");
-			String start = times[0];
-			String end = times[1];
+    public void rebuildPendingUsers() {
+        pendingUsers.clear();
+        for (User user : allUsers) {
+            if (!(user instanceof Administrator) && !user.isApproved()) pendingUsers.add(user);
+        }
+    }
 
-			if (currentDate == null) {
-				currentDate = datePart;
-				currentStart = start;
-				currentEnd = end;
-			} else if (currentDate.equals(datePart) && currentEnd.equals(start)) {
-				currentEnd = end;
-			} else {
-				uiSlotList.add(currentDate + " | " + currentStart + " - " + currentEnd);
-				currentDate = datePart;
-				currentStart = start;
-				currentEnd = end;
-			}
-		}
+    public boolean confirmAction(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
 
-		if (currentDate != null) {
-			uiSlotList.add(currentDate + " | " + currentStart + " - " + currentEnd);
-		}
-	}
+    public void updateStudentUIList() {
+        uiSlotList.clear();
+        if (systemTimeSlots.isEmpty()) return;
 
-	public void switchScreen(Scene scene) {
-		window.setScene(scene);
-		window.setWidth(Double.NaN);
-		window.setHeight(Double.NaN);
-		window.sizeToScene();
-		window.centerOnScreen();
-	}
+        CustomBST<TimeSlot> bst = new CustomBST<>();
+        for (TimeSlot slot : systemTimeSlots) bst.insert(slot);
 
-	public void showLogin() {
-		switchScreen(new Scene(new LoginScreen(this).getContent(), 450, 400));
-	}
+        List<TimeSlot> sortedSlots = bst.getSortedList();
+        String currentDate = null, currentStart = null, currentEnd = null;
 
-	public void showStudent() {
-		switchScreen(new Scene(new StudentDashboard(this).getContent(), 500, 500));
-	}
+        for (TimeSlot slot : sortedSlots) {
+            String[] parts = slot.getTimeRange().split(" \\| ");
+            if (parts.length < 2) continue;
+            String datePart = parts[0];
+            String[] times = parts[1].split(" - ");
+            if (times.length < 2) continue;
+            String start = times[0], end = times[1];
 
-	public void showAdmin() {
-		switchScreen(new Scene(new AdminDashboard(this).getContent(), 450, 400));
-	}
+            if (currentDate == null) {
+                currentDate = datePart; currentStart = start; currentEnd = end;
+            } else if (currentDate.equals(datePart) && currentEnd.equals(start)) {
+                currentEnd = end;
+            } else {
+                uiSlotList.add(currentDate + " | " + currentStart + " - " + currentEnd);
+                currentDate = datePart; currentStart = start; currentEnd = end;
+            }
+        }
+        if (currentDate != null) uiSlotList.add(currentDate + " | " + currentStart + " - " + currentEnd);
+    }
 
-	public void showStaff() {
-		switchScreen(new Scene(new StaffDashboard(this).getContent(), 950, 750));
-	}
+    public void switchScreen(Scene scene) {
+        window.setScene(scene);
+        window.setWidth(Double.NaN);
+        window.setHeight(Double.NaN);
+        window.sizeToScene();
+        window.centerOnScreen();
+    }
 
-	public void showSignUp() {
-		switchScreen(new Scene(new SignUpScreen(this).getContent(), 450, 500));
-	}
+    public void showLogin() { switchScreen(new Scene(new LoginScreen(this).getContent(), 760, 520)); }
+    public void showStudent() { switchScreen(new Scene(new StudentDashboard(this).getContent(), 500, 500)); }
+    public void showAdmin() { switchScreen(new Scene(new AdminDashboard(this).getContent(), 600, 460)); }
+    public void showStaff() { switchScreen(new Scene(new StaffDashboard(this).getContent(), 950, 750)); }
+    public void showSignUp() { switchScreen(new Scene(new SignUpScreen(this).getContent(), 450, 540)); }
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+    public static void main(String[] args) { launch(args); }
 }

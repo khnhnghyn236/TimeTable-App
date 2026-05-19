@@ -1,100 +1,275 @@
 package gui;
 
-import javafx.geometry.Pos;
+import javafx.animation.FadeTransition;
+import javafx.geometry.*;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.util.Duration;
 import main.AppSchedulerGUI;
+import main.UserPersistence;
 import users.*;
 
 public class LoginScreen {
-	private AppSchedulerGUI app;
+    private static final String BLUE_DARK = "#0C447C";
+    private static final String BLUE_MID = "#185FA5";
+    private static final String BLUE_LIGHT = "#378ADD";
+    private static final String BLUE_MUTED = "#85B7EB";
+    private static final String WHITE = "#FFFFFF";
+    private static final String BG_PAGE = "#F5F7FA";
+    private static final String BG_FIELD = "#EEF2F7";
+    private static final String TEXT_DARK = "#1A1A2E";
+    private static final String TEXT_MUTED = "#5F6368";
+    private static final String ERROR_RED = "#D93025";
+    private static final String WARN_AMBER = "#B06000";
+    private static final String WARN_BG = "#FEF7E0";
 
-	public LoginScreen(AppSchedulerGUI app) {
-		this.app = app;
-	}
+    private final AppSchedulerGUI app;
 
-	public VBox getContent() {
-		VBox layout = new VBox(15);
-		layout.setAlignment(Pos.CENTER);
-		layout.setStyle("-fx-background-color: #FFFFFF;");
+    public LoginScreen(AppSchedulerGUI app) {
+        this.app = app;
+    }
 
-		Label welcomeLabel = new Label("TimeTable Login");
-		welcomeLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+    public HBox getContent() {
+        HBox root = new HBox();
+        root.setStyle("-fx-background-color: " + BG_PAGE + ";");
+        root.getChildren().addAll(buildSidebar(), buildForm());
+        return root;
+    }
 
-		TextField idInput = new TextField();
-		idInput.setPromptText("Enter ID (e.g., V202502059)");
-		idInput.setMaxWidth(200);
+    private VBox buildSidebar() {
+        VBox side = new VBox(24);
+        side.setPrefWidth(220);
+        side.setMinWidth(220);
+        side.setPadding(new Insets(40, 28, 32, 28));
+        side.setStyle("-fx-background-color: " + BLUE_DARK + ";");
 
-		PasswordField passInput = new PasswordField();
-		passInput.setPromptText("Password");
-		passInput.setMaxWidth(200);
+        Label appName = new Label("TimeTable");
+        appName.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
 
-		Label warningLabel = new Label();
+        Label tagline = new Label("APPOINTMENT PLATFORM");
+        tagline.setStyle("-fx-font-size: 10px; -fx-text-fill: " + BLUE_MUTED + ";");
 
-		Button btnLogin = new Button("Login");
-		btnLogin.setStyle(
-				"-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-pref-width: 200px; -fx-cursor: hand;");
+        VBox brand = new VBox(4, appName, tagline);
+        VBox feats = new VBox(20,
+                featureItem("Smart Scheduling", "Book rooms & slots instantly"),
+                featureItem("Secure Access", "Role-based admin approval"),
+                featureItem("Notifications", "Real-time booking updates"));
+        VBox.setVgrow(feats, Priority.ALWAYS);
 
-		btnLogin.setOnAction(e -> {
-			String id = idInput.getText().trim();
-			String pass = passInput.getText();
+        Label footer = new Label("VinUniversity © 2025");
+        footer.setStyle("-fx-font-size: 11px; -fx-text-fill: " + BLUE_LIGHT + ";");
 
-			if (id.isEmpty() || pass.isEmpty()) {
-				warningLabel.setText("Please enter ID and password.");
-				warningLabel.setStyle("-fx-text-fill: red;");
-				return;
-			}
+        side.getChildren().addAll(brand, new Separator(), feats, footer);
+        return side;
+    }
 
-			if (!app.userDatabase.containsKey(id)) {
-				warningLabel.setText("Account does not exist.");
-				warningLabel.setStyle("-fx-text-fill: red;");
-				return;
-			}
+    private VBox featureItem(String title, String desc) {
+        Label titleLbl = new Label(title);
+        titleLbl.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + WHITE + ";");
+        Label descLbl = new Label(desc);
+        descLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: " + BLUE_MUTED + ";");
+        descLbl.setWrapText(true);
+        return new VBox(2, titleLbl, descLbl);
+    }
 
-			User user = app.userDatabase.get(id);
+    private VBox buildForm() {
+        VBox form = new VBox(0);
+        form.setPadding(new Insets(48, 44, 48, 44));
+        form.setAlignment(Pos.CENTER_LEFT);
+        form.setStyle("-fx-background-color: " + WHITE + ";");
+        HBox.setHgrow(form, Priority.ALWAYS);
 
-			if (!user.getPassword().equals(pass)) {
-				warningLabel.setText("Incorrect password.");
-				warningLabel.setStyle("-fx-text-fill: red;");
-				return;
-			}
+        Label heading = new Label("Welcome back");
+        heading.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_DARK + ";");
+        Label subheading = new Label("Sign in to your TimeTable account");
+        subheading.setStyle("-fx-font-size: 13px; -fx-text-fill: " + TEXT_MUTED + ";");
+        VBox headingBox = new VBox(4, heading, subheading);
+        headingBox.setPadding(new Insets(0, 0, 24, 0));
 
-			if (!user.isApproved()) {
-				warningLabel.setText("Admin has not approved this account yet.");
-				warningLabel.setStyle("-fx-text-fill: #d4a017;");
-				return;
-			}
+        Label idLbl = fieldLabel("Student / Staff ID");
+        TextField idField = styledTextField("e.g. V202502059");
+        Label idErr = errorLabel();
 
-			if (user instanceof Administrator) {
-				app.currentAdmin = (Administrator) user;
-				app.showAdmin();
-			} else if (user instanceof Student) {
-				app.currentStudent = (Student) user;
-				app.showStudent();
-			} else if (user instanceof AcademicStaff) {
-				app.currentStaff = (AcademicStaff) user;
-				app.showStaff();
-			} else {
-				warningLabel.setText("Unknown account role.");
-				warningLabel.setStyle("-fx-text-fill: red;");
-			}
-		});
+        String remembered = UserPersistence.loadRememberedId();
+        if (remembered != null) idField.setText(remembered);
 
-		Button btnAdmin = new Button("Use Demo Admin Account");
-		btnAdmin.setStyle("-fx-background-color: transparent; -fx-text-fill: #5f6368; -fx-cursor: hand;");
-		btnAdmin.setOnAction(e -> {
-			idInput.setText("A001");
-			passInput.setText("admin123");
-			warningLabel.setText("Demo admin filled. Click Login.");
-			warningLabel.setStyle("-fx-text-fill: #5f6368;");
-		});
+        Label passLbl = fieldLabel("Password");
+        PasswordField passField = styledPasswordField("Enter your password");
+        TextField passVisible = styledTextField("");
+        passVisible.setVisible(false);
+        passVisible.setManaged(false);
+        Label passErr = errorLabel();
 
-		Label signupText = new Label("Not a member? Create an account here!");
-		signupText.setStyle("-fx-text-fill: #1a73e8; -fx-cursor: hand; -fx-underline: true;");
-		signupText.setOnMouseClicked(e -> app.showSignUp());
+        Button eyeBtn = new Button("Show");
+        eyeBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-cursor: hand; -fx-font-size: 12px;");
+        final boolean[] showing = { false };
+        eyeBtn.setOnAction(ev -> {
+            showing[0] = !showing[0];
+            if (showing[0]) {
+                passVisible.setText(passField.getText());
+                passVisible.setVisible(true);
+                passVisible.setManaged(true);
+                passField.setVisible(false);
+                passField.setManaged(false);
+                eyeBtn.setText("Hide");
+            } else {
+                passField.setText(passVisible.getText());
+                passField.setVisible(true);
+                passField.setManaged(true);
+                passVisible.setVisible(false);
+                passVisible.setManaged(false);
+                eyeBtn.setText("Show");
+            }
+        });
 
-		layout.getChildren().addAll(welcomeLabel, idInput, passInput, btnLogin, warningLabel, btnAdmin, new Separator(),
-				signupText);
-		return layout;
-	}
+        HBox passRow = new HBox(0, passField, passVisible, eyeBtn);
+        passRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(passField, Priority.ALWAYS);
+        HBox.setHgrow(passVisible, Priority.ALWAYS);
+        passRow.setStyle("-fx-border-color: #C8D4E8; -fx-border-radius: 8; -fx-background-color: " + BG_FIELD + "; -fx-background-radius: 8;");
+
+        CheckBox rememberBox = new CheckBox("Remember my ID");
+        rememberBox.setStyle("-fx-font-size: 13px; -fx-text-fill: " + TEXT_MUTED + ";");
+        rememberBox.setSelected(remembered != null);
+        rememberBox.setPadding(new Insets(8, 0, 16, 0));
+
+        Label statusLabel = new Label();
+        statusLabel.setWrapText(true);
+        statusLabel.setMaxWidth(320);
+
+        Button loginBtn = primaryButton("Sign In");
+        loginBtn.setOnAction(ev -> {
+            idErr.setText("");
+            passErr.setText("");
+            statusLabel.setText("");
+            statusLabel.setStyle("");
+
+            String id = idField.getText().trim();
+            String pass = showing[0] ? passVisible.getText() : passField.getText();
+
+            if (id.isEmpty()) { idErr.setText("ID cannot be empty."); shake(idField); return; }
+            if (pass.isEmpty()) { passErr.setText("Password cannot be empty."); shake(passRow); return; }
+            if (!app.userDatabase.containsKey(id)) { idErr.setText("No account found with this ID."); shake(idField); return; }
+
+            User user = app.userDatabase.get(id);
+            if (!user.verifyPassword(pass)) { passErr.setText("Incorrect password. Please try again."); shake(passRow); return; }
+            if (!user.isApproved()) { showStatus(statusLabel, "Your account is pending admin approval.", WARN_AMBER, WARN_BG); return; }
+
+            if (rememberBox.isSelected()) UserPersistence.saveRememberedId(id);
+            else UserPersistence.clearRememberedId();
+
+            if (user instanceof Administrator) {
+                app.currentAdmin = (Administrator) user;
+                app.showAdmin();
+            } else if (user instanceof Student) {
+                app.currentStudent = (Student) user;
+                app.showStudent();
+            } else if (user instanceof AcademicStaff) {
+                app.currentStaff = (AcademicStaff) user;
+                app.showStaff();
+            } else {
+                showStatus(statusLabel, "Unknown account role. Contact admin.", ERROR_RED, "#FDE8E8");
+            }
+        });
+
+        Button demoBtn = ghostButton("Use Demo Admin Account");
+        demoBtn.setOnAction(ev -> {
+            idField.setText("A001");
+            passField.setText("admin123");
+            if (showing[0]) passVisible.setText("admin123");
+            showStatus(statusLabel, "Demo credentials filled. Click Sign In.", TEXT_MUTED, BG_FIELD);
+        });
+
+        HBox demoBanner = demoBanner();
+        Separator sep = new Separator();
+        sep.setPadding(new Insets(16, 0, 12, 0));
+
+        Label signupPrompt = new Label("Not a member?  ");
+        signupPrompt.setStyle("-fx-font-size: 13px; -fx-text-fill: " + TEXT_MUTED + ";");
+        Label signupLink = new Label("Create an account");
+        signupLink.setStyle("-fx-font-size: 13px; -fx-text-fill: " + BLUE_MID + "; -fx-cursor: hand; -fx-underline: true;");
+        signupLink.setOnMouseClicked(ev -> app.showSignUp());
+        HBox signupRow = new HBox(0, signupPrompt, signupLink);
+        signupRow.setAlignment(Pos.CENTER_LEFT);
+
+        VBox idBlock = new VBox(4, idLbl, idField, idErr);
+        idBlock.setPadding(new Insets(0, 0, 14, 0));
+        VBox passBlock = new VBox(4, passLbl, passRow, passErr);
+        passBlock.setPadding(new Insets(0, 0, 4, 0));
+        VBox btnBlock = new VBox(10, loginBtn, demoBtn, statusLabel);
+        btnBlock.setPadding(new Insets(4, 0, 0, 0));
+
+        form.getChildren().addAll(headingBox, demoBanner, idBlock, passBlock, rememberBox, btnBlock, sep, signupRow);
+        return form;
+    }
+
+    private HBox demoBanner() {
+        Label msg = new Label("Demo: A001 / admin123 for Admin, P001 / pass123 for Staff, V202502059 / pass123 for Student");
+        msg.setStyle("-fx-font-size: 12px; -fx-text-fill: " + WARN_AMBER + ";");
+        msg.setWrapText(true);
+        HBox box = new HBox(8, msg);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setStyle("-fx-background-color: " + WARN_BG + "; -fx-background-radius: 8; -fx-border-color: #F0CC72; -fx-border-radius: 8; -fx-padding: 10 14 10 14;");
+        box.setPadding(new Insets(0, 0, 20, 0));
+        HBox.setHgrow(box, Priority.ALWAYS);
+        return box;
+    }
+
+    private Label fieldLabel(String text) {
+        Label l = new Label(text.toUpperCase());
+        l.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_MUTED + ";");
+        return l;
+    }
+
+    private TextField styledTextField(String prompt) {
+        TextField f = new TextField();
+        f.setPromptText(prompt);
+        f.setStyle("-fx-background-color: " + BG_FIELD + "; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #C8D4E8; -fx-pref-height: 40px; -fx-font-size: 14px; -fx-padding: 0 12 0 12;");
+        f.setMaxWidth(Double.MAX_VALUE);
+        return f;
+    }
+
+    private PasswordField styledPasswordField(String prompt) {
+        PasswordField f = new PasswordField();
+        f.setPromptText(prompt);
+        f.setStyle("-fx-background-color: transparent; -fx-pref-height: 40px; -fx-font-size: 14px; -fx-padding: 0 12 0 12;");
+        f.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(f, Priority.ALWAYS);
+        return f;
+    }
+
+    private Label errorLabel() {
+        Label l = new Label();
+        l.setStyle("-fx-font-size: 12px; -fx-text-fill: " + ERROR_RED + ";");
+        l.setWrapText(true);
+        return l;
+    }
+
+    private Button primaryButton(String text) {
+        Button b = new Button(text);
+        b.setMaxWidth(Double.MAX_VALUE);
+        b.setPrefHeight(44);
+        b.setStyle("-fx-background-color: " + BLUE_MID + "; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+        return b;
+    }
+
+    private Button ghostButton(String text) {
+        Button b = new Button(text);
+        b.setMaxWidth(Double.MAX_VALUE);
+        b.setPrefHeight(38);
+        b.setStyle("-fx-background-color: transparent; -fx-border-color: #C8D4E8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 13px; -fx-text-fill: " + TEXT_MUTED + "; -fx-cursor: hand;");
+        return b;
+    }
+
+    private void showStatus(Label lbl, String msg, String textColor, String bgColor) {
+        lbl.setText(msg);
+        lbl.setStyle("-fx-font-size: 13px; -fx-text-fill: " + textColor + "; -fx-background-color: " + bgColor + "; -fx-background-radius: 6; -fx-padding: 8 12 8 12;");
+        FadeTransition ft = new FadeTransition(Duration.millis(300), lbl);
+        ft.setFromValue(0); ft.setToValue(1); ft.play();
+    }
+
+    private void shake(javafx.scene.Node node) {
+        javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(Duration.millis(60), node);
+        tt.setFromX(0); tt.setByX(8); tt.setCycleCount(4); tt.setAutoReverse(true); tt.play();
+    }
 }
