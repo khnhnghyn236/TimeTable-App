@@ -172,15 +172,7 @@ public class LoginScreen {
             }
         });
 
-        Button demoBtn = ghostButton("Use Demo Admin Account");
-        demoBtn.setOnAction(ev -> {
-            idField.setText("A001");
-            passField.setText("admin123");
-            if (showing[0]) passVisible.setText("admin123");
-            showStatus(statusLabel, "Demo credentials filled. Click Sign In.", TEXT_MUTED, BG_FIELD);
-        });
 
-        HBox demoBanner = demoBanner();
         Separator sep = new Separator();
         sep.setPadding(new Insets(16, 0, 12, 0));
 
@@ -196,10 +188,10 @@ public class LoginScreen {
         idBlock.setPadding(new Insets(0, 0, 14, 0));
         VBox passBlock = new VBox(4, passLbl, passRow, passErr);
         passBlock.setPadding(new Insets(0, 0, 4, 0));
-        VBox btnBlock = new VBox(10, loginBtn, demoBtn, statusLabel);
+        VBox btnBlock = new VBox(10, loginBtn, statusLabel);
         btnBlock.setPadding(new Insets(4, 0, 0, 0));
 
-        form.getChildren().addAll(headingBox, demoBanner, idBlock, passBlock, rememberBox, btnBlock, sep, signupRow);
+        form.getChildren().addAll(headingBox, idBlock, passBlock, rememberBox, btnBlock, sep, signupRow);
         return form;
     }
 

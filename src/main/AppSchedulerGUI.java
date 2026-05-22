@@ -18,6 +18,7 @@ public class AppSchedulerGUI extends Application {
 
     public List<TimeSlot> systemTimeSlots = new ArrayList<>();
     public ObservableList<String> uiSlotList = FXCollections.observableArrayList();
+    public ObservableList<Resource> resourceCatalog = FXCollections.observableArrayList();
     public Resource activeResource = new Resource("General Office", 2);
 
     public CustomHashMap<String, User> userDatabase = new CustomHashMap<>();
@@ -36,8 +37,10 @@ public class AppSchedulerGUI extends Application {
         window.setTitle("TimeTable - Appointment Scheduling Platform");
 
         loadUsersFromStorage();
+        loadResourcesFromStorage();
 
-        systemTimeSlots = DataManager.loadState();
+        systemTimeSlots = DataManager.loadState(allUsers);
+        syncResourcesFromSlots();
         updateStudentUIList();
 
         showLogin();
@@ -54,17 +57,43 @@ public class AppSchedulerGUI extends Application {
         rebuildPendingUsers();
     }
 
-    private void createDefaultUsers() {
-        Student testStudent = new Student("V202502059", "Truong Ba Ky", "ky@vinuni.edu", "pass123");
-        testStudent.setApproved(true);
-        AcademicStaff testStaff = new AcademicStaff("P001", "Prof. Bob", "bob@vinuni.edu", "pass123");
-        testStaff.setApproved(true);
-        Administrator testAdmin = new Administrator("A001", "Admin Alice", "alice@vinuni.edu", "admin123");
-        testAdmin.setApproved(true);
-        allUsers.add(testStudent);
-        allUsers.add(testStaff);
-        allUsers.add(testAdmin);
+    private void loadResourcesFromStorage() {
+        List<Resource> savedResources = DataManager.loadResources();
+        resourceCatalog.clear();
+        if (savedResources.isEmpty()) {
+            resourceCatalog.add(new Resource("General Office", 2));
+            resourceCatalog.add(new Resource("Library Study Room A", 4));
+            resourceCatalog.add(new Resource("Consultation Room B", 2));
+            DataManager.saveResources(new ArrayList<>(resourceCatalog));
+        } else {
+            resourceCatalog.addAll(savedResources);
+        }
+        activeResource = resourceCatalog.get(0);
     }
+
+    private void syncResourcesFromSlots() {
+        for (TimeSlot slot : systemTimeSlots) {
+            addResourceIfMissing(slot.getResource(), false);
+        }
+        DataManager.saveResources(new ArrayList<>(resourceCatalog));
+    }
+
+    private void createDefaultUsers() {
+        Administrator admin1 = new Administrator("V202502310", "Nguyen Hong Khanh", "khanh@vinuni.edu", "admin123");
+        Administrator admin2 = new Administrator("V202502059", "Truong Ba Ky", "ky@vinuni.edu", "admin123");
+        Administrator admin3 = new Administrator("V202502448", "Nguyen Trong Nguyen", "nguyen@vinuni.edu", "admin123");
+        Administrator admin4 = new Administrator("V202502393", "Tran Trong Tai", "tai@vinuni.edu", "admin123");
+
+        admin1.setApproved(true);
+        admin2.setApproved(true);
+        admin3.setApproved(true);
+        admin4.setApproved(true);
+
+        allUsers.add(admin1);
+        allUsers.add(admin2);
+        allUsers.add(admin3);
+        allUsers.add(admin4);
+    }   
 
     public void registerNewUser(User user) {
         allUsers.add(user);
@@ -105,6 +134,61 @@ public class AppSchedulerGUI extends Application {
         }
     }
 
+    public boolean addResource(Resource resource) {
+        boolean added = addResourceIfMissing(resource, true);
+        if (added) DataManager.saveResources(new ArrayList<>(resourceCatalog));
+        return added;
+    }
+
+    private boolean addResourceIfMissing(Resource resource, boolean updateActive) {
+        for (Resource existing : resourceCatalog) {
+            if (existing.getName().equalsIgnoreCase(resource.getName())) return false;
+        }
+        resourceCatalog.add(resource);
+        if (updateActive) activeResource = resource;
+        return true;
+    }
+
+    public boolean resourceNameExists(String name) {
+        for (Resource resource : resourceCatalog) {
+            if (resource.getName().equalsIgnoreCase(name.trim())) return true;
+        }
+        return false;
+    }
+
+    public boolean slotExists(Resource resource, String timeRange) {
+        for (TimeSlot slot : systemTimeSlots) {
+            if (slot.getResource().equals(resource) && slot.getTimeRange().equals(timeRange)) return true;
+        }
+        return false;
+    }
+
+    public TimeSlot findSlot(Resource resource, String timeRange) {
+        for (TimeSlot slot : systemTimeSlots) {
+            if (slot.getResource().equals(resource) && slot.getTimeRange().equals(timeRange)) return slot;
+        }
+        return null;
+    }
+
+    public Student findApprovedStudent(String idOrEmail) {
+        if (idOrEmail == null) return null;
+        String query = idOrEmail.trim();
+        if (query.isEmpty()) return null;
+        for (User user : allUsers) {
+            if (user instanceof Student && user.isApproved()
+                    && (user.getUserId().equalsIgnoreCase(query) || user.getEmail().equalsIgnoreCase(query))) {
+                return (Student) user;
+            }
+        }
+        return null;
+    }
+
+    public void saveAllBookingData() {
+        DataManager.saveState(systemTimeSlots);
+        DataManager.saveResources(new ArrayList<>(resourceCatalog));
+        updateStudentUIList();
+    }
+
     public boolean confirmAction(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
@@ -122,26 +206,9 @@ public class AppSchedulerGUI extends Application {
         for (TimeSlot slot : systemTimeSlots) bst.insert(slot);
 
         List<TimeSlot> sortedSlots = bst.getSortedList();
-        String currentDate = null, currentStart = null, currentEnd = null;
-
         for (TimeSlot slot : sortedSlots) {
-            String[] parts = slot.getTimeRange().split(" \\| ");
-            if (parts.length < 2) continue;
-            String datePart = parts[0];
-            String[] times = parts[1].split(" - ");
-            if (times.length < 2) continue;
-            String start = times[0], end = times[1];
-
-            if (currentDate == null) {
-                currentDate = datePart; currentStart = start; currentEnd = end;
-            } else if (currentDate.equals(datePart) && currentEnd.equals(start)) {
-                currentEnd = end;
-            } else {
-                uiSlotList.add(currentDate + " | " + currentStart + " - " + currentEnd);
-                currentDate = datePart; currentStart = start; currentEnd = end;
-            }
+            uiSlotList.add(slot.getSummary());
         }
-        if (currentDate != null) uiSlotList.add(currentDate + " | " + currentStart + " - " + currentEnd);
     }
 
     public void switchScreen(Scene scene) {
@@ -153,9 +220,9 @@ public class AppSchedulerGUI extends Application {
     }
 
     public void showLogin() { switchScreen(new Scene(new LoginScreen(this).getContent(), 760, 520)); }
-    public void showStudent() { switchScreen(new Scene(new StudentDashboard(this).getContent(), 500, 500)); }
-    public void showAdmin() { switchScreen(new Scene(new AdminDashboard(this).getContent(), 600, 460)); }
-    public void showStaff() { switchScreen(new Scene(new StaffDashboard(this).getContent(), 950, 750)); }
+    public void showStudent() { switchScreen(new Scene(new StudentDashboard(this).getContent(), 780, 560)); }
+    public void showAdmin() { switchScreen(new Scene(new AdminDashboard(this).getContent(), 760, 520)); }
+    public void showStaff() { switchScreen(new Scene(new StaffDashboard(this).getContent(), 1000, 760)); }
     public void showSignUp() { switchScreen(new Scene(new SignUpScreen(this).getContent(), 450, 540)); }
 
     public static void main(String[] args) { launch(args); }
