@@ -14,6 +14,13 @@ import java.time.*;
 import java.util.*;
 
 public class AppSchedulerGUI extends Application {
+    private static final String[][] DEFAULT_ADMINS = {
+            {"V202502310", "Nguyen Hong Khanh", "khanh@vinuni.edu"},
+            {"V202502059", "Truong Ba Ky", "ky@vinuni.edu"},
+            {"V202502448", "Nguyen Trong Nguyen", "nguyen@vinuni.edu"},
+            {"V202502393", "Tran Trong Tai", "tai@vinuni.edu"}
+    };
+
     private Stage window;
 
     public List<TimeSlot> systemTimeSlots = new ArrayList<>();
@@ -52,6 +59,8 @@ public class AppSchedulerGUI extends Application {
         if (allUsers.isEmpty()) {
             createDefaultUsers();
             DataManager.saveUsers(allUsers);
+        } else if (ensureDefaultAdmins()) {
+            DataManager.saveUsers(allUsers);
         }
         rebuildUserDatabase();
         rebuildPendingUsers();
@@ -79,21 +88,47 @@ public class AppSchedulerGUI extends Application {
     }
 
     private void createDefaultUsers() {
-        Administrator admin1 = new Administrator("V202502310", "Nguyen Hong Khanh", "khanh@vinuni.edu", "admin123");
-        Administrator admin2 = new Administrator("V202502059", "Truong Ba Ky", "ky@vinuni.edu", "admin123");
-        Administrator admin3 = new Administrator("V202502448", "Nguyen Trong Nguyen", "nguyen@vinuni.edu", "admin123");
-        Administrator admin4 = new Administrator("V202502393", "Tran Trong Tai", "tai@vinuni.edu", "admin123");
-
-        admin1.setApproved(true);
-        admin2.setApproved(true);
-        admin3.setApproved(true);
-        admin4.setApproved(true);
-
-        allUsers.add(admin1);
-        allUsers.add(admin2);
-        allUsers.add(admin3);
-        allUsers.add(admin4);
+        for (String[] admin : DEFAULT_ADMINS) {
+            allUsers.add(createDefaultAdmin(admin));
+        }
     }   
+
+    private boolean ensureDefaultAdmins() {
+        boolean changed = false;
+        for (String[] adminInfo : DEFAULT_ADMINS) {
+            int existingIndex = findUserIndexById(adminInfo[0]);
+            Administrator defaultAdmin = createDefaultAdmin(adminInfo);
+            if (existingIndex == -1) {
+                allUsers.add(defaultAdmin);
+                changed = true;
+            } else {
+                User existingUser = allUsers.get(existingIndex);
+                boolean needsUpdate = !(existingUser instanceof Administrator)
+                        || !existingUser.getName().equals(defaultAdmin.getName())
+                        || !existingUser.getEmail().equals(defaultAdmin.getEmail())
+                        || !existingUser.verifyPassword("admin123")
+                        || !existingUser.isApproved();
+                if (needsUpdate) {
+                    allUsers.set(existingIndex, defaultAdmin);
+                    changed = true;
+                }
+            }
+        }
+        return changed;
+    }
+
+    private int findUserIndexById(String userId) {
+        for (int i = 0; i < allUsers.size(); i++) {
+            if (allUsers.get(i).getUserId().equalsIgnoreCase(userId)) return i;
+        }
+        return -1;
+    }
+
+    private Administrator createDefaultAdmin(String[] adminInfo) {
+        Administrator admin = new Administrator(adminInfo[0], adminInfo[1], adminInfo[2], "admin123");
+        admin.setApproved(true);
+        return admin;
+    }
 
     public void registerNewUser(User user) {
         allUsers.add(user);

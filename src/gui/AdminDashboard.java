@@ -32,7 +32,7 @@ public class AdminDashboard {
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        Tab resourceTab = new Tab("Resource Management");
+        Tab resourceTab = new Tab("Room Management");
         resourceTab.setContent(createResourceTab());
 
         Tab requestTab = new Tab("Request Center");
@@ -49,15 +49,35 @@ public class AdminDashboard {
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
 
+        Label header = new Label("Create and manage bookable campus rooms:");
+        header.setStyle("-fx-font-weight: bold;");
+
         TextField resourceNameInput = new TextField();
-        resourceNameInput.setPromptText("Enter Resource Name (e.g., Library Study Room B)");
+        resourceNameInput.setPromptText("Room name, e.g., Library Study Room B");
 
         TextField capacityInput = new TextField();
-        capacityInput.setPromptText("Enter Capacity (e.g., 4)");
+        capacityInput.setPromptText("Capacity, e.g., 4");
 
-        Button createBtn = new Button("Create Resource");
+        Button createBtn = new Button("Create Room");
+        createBtn.setStyle("-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-cursor: hand;");
+
         Label statusLabel = new Label("Status: Ready");
         statusLabel.setStyle("-fx-text-fill: green;");
+
+        ListView<Resource> resourceList = new ListView<>(app.resourceCatalog);
+        resourceList.setPlaceholder(new Label("No room has been created yet."));
+        resourceList.setCellFactory(param -> new ListCell<Resource>() {
+            @Override
+            protected void updateItem(Resource resource, boolean empty) {
+                super.updateItem(resource, empty);
+                if (empty || resource == null) {
+                    setText(null);
+                } else {
+                    setText(resource.getName() + "   •   Capacity: " + resource.getCapacity());
+                }
+            }
+        });
+        VBox.setVgrow(resourceList, Priority.ALWAYS);
 
         createBtn.setOnAction(e -> {
             try {
@@ -65,29 +85,43 @@ public class AdminDashboard {
                 int capacity = Integer.parseInt(capacityInput.getText().trim());
 
                 if (name.isEmpty()) {
-                    statusLabel.setText("Status: Error! Resource name cannot be empty.");
-                    statusLabel.setStyle("-fx-text-fill: red;");
+                    showStatus(statusLabel, "Status: Error! Room name cannot be empty.", true);
+                    return;
+                }
+                if (name.contains("|") || name.contains(",")) {
+                    showStatus(statusLabel, "Status: Error! Please avoid | and comma in room names.", true);
                     return;
                 }
                 if (capacity <= 0) {
-                    statusLabel.setText("Status: Error! Capacity must be greater than 0.");
-                    statusLabel.setStyle("-fx-text-fill: red;");
+                    showStatus(statusLabel, "Status: Error! Capacity must be greater than 0.", true);
+                    return;
+                }
+                if (app.resourceNameExists(name)) {
+                    showStatus(statusLabel, "Status: Error! This room already exists.", true);
                     return;
                 }
 
-                app.activeResource = new Resource(name, capacity);
-                statusLabel.setText("Status: Successfully created " + name);
-                statusLabel.setStyle("-fx-text-fill: green;");
+                Resource resource = new Resource(name, capacity);
+                app.addResource(resource);
+                showStatus(statusLabel, "Status: Successfully created " + name, false);
                 resourceNameInput.clear();
                 capacityInput.clear();
             } catch (NumberFormatException ex) {
-                statusLabel.setText("Status: Error! Capacity must be a number.");
-                statusLabel.setStyle("-fx-text-fill: red;");
+                showStatus(statusLabel, "Status: Error! Capacity must be a number.", true);
             }
         });
 
-        box.getChildren().addAll(new Label("Manage Campus Resources:"), resourceNameInput, capacityInput, createBtn, statusLabel);
+        HBox form = new HBox(10, resourceNameInput, capacityInput, createBtn);
+        HBox.setHgrow(resourceNameInput, Priority.ALWAYS);
+        capacityInput.setMaxWidth(120);
+
+        box.getChildren().addAll(header, form, statusLabel, new Label("Available Rooms:"), resourceList);
         return box;
+    }
+
+    private void showStatus(Label label, String message, boolean error) {
+        label.setText(message);
+        label.setStyle(error ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
     }
 
     private VBox createRequestTab() {

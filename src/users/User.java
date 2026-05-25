@@ -2,6 +2,7 @@ package users;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Objects;
 
 public abstract class User {
     protected String userId;
@@ -51,5 +52,23 @@ public abstract class User {
         } catch (Exception e) {
             throw new RuntimeException("Error hashing password", e);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof User)) return false;
+        User other = (User) obj;
+        return userId != null && userId.equalsIgnoreCase(other.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId == null ? "" : userId.toLowerCase());
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + userId + ")";
     }
 }
