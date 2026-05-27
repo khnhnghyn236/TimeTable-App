@@ -14,6 +14,16 @@ Built entirely in Java using the JavaFX framework, the project heavily applies O
 * **Data Persistence:** Standard File I/O for local storage. 
 * **Time Tracking:** `java.time` API for precise calendar mathematics. 
 
+## 📂 Directory Structure
+
+The project has been organized for better maintainability and data separation:
+
+* **`src/`**: Contains all Java source code packages (scheduling, users, main GUI logic).
+* **`dependencies/`**: Bundles the required JavaFX 21 SDK and JDK 21 for seamless out-of-the-box execution in VS Code.
+* **`data/`**: Dedicated directory for persistent application storage (e.g., `appointments_data.txt`, `users_data.csv`, `resources_data.csv`).
+* **`log/`**: Archives unused, obsolete, or backup data files and legacy configurations.
+* **`.vscode/`**: Contains all necessary VS Code IDE configurations (`launch.json`, `settings.json`) pre-configured to utilize the bundled dependencies.
+
 ## 🚀 Core Features & Use Cases
 
 The system is driven by three primary actors, each with specific roles and capabilities: 

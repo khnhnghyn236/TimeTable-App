@@ -1,7 +1,7 @@
 package main;
 
 import users.Student;
-import users.AcademicStaff;
+
 import users.Administrator;
 import scheduling.Resource;
 import scheduling.TimeSlot;
@@ -14,7 +14,7 @@ public class Main {
 
 		// 1. Create our Users (UPDATED with Email and Password)
 		Administrator admin = new Administrator("A001", "Admin Alice", "admin@vinuni.edu", "admin123");
-		AcademicStaff prof = new AcademicStaff("P001", "Prof. Bob", "bob@vinuni.edu", "pass123");
+		// AcademicStaff prof = new AcademicStaff("P001", "Prof. Bob", "bob@vinuni.edu", "pass123");
 
 		Student student1 = new Student("V001", "Truong Ba Ky", "ky@vinuni.edu", "pass123");
 		Student student2 = new Student("V002", "Nguyen Hong Khanh", "khanh@vinuni.edu", "pass123");

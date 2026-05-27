@@ -10,4 +10,12 @@ public class Appointment {
 		this.student = student;
 		this.timeSlot = timeSlot;
 	}
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public TimeSlot getTimeSlot() {
+        return timeSlot;
+    }
 }

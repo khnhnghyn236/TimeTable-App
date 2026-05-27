@@ -172,6 +172,11 @@ public class LoginScreen {
             }
         });
 
+        passField.setOnKeyPressed(ev -> {
+            if (ev.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                loginBtn.fire();
+            }
+        });
 
         Separator sep = new Separator();
         sep.setPadding(new Insets(16, 0, 12, 0));
@@ -195,17 +200,6 @@ public class LoginScreen {
         return form;
     }
 
-    private HBox demoBanner() {
-        Label msg = new Label("Demo: A001 / admin123 for Admin, P001 / pass123 for Staff, V202502059 / pass123 for Student");
-        msg.setStyle("-fx-font-size: 12px; -fx-text-fill: " + WARN_AMBER + ";");
-        msg.setWrapText(true);
-        HBox box = new HBox(8, msg);
-        box.setAlignment(Pos.CENTER_LEFT);
-        box.setStyle("-fx-background-color: " + WARN_BG + "; -fx-background-radius: 8; -fx-border-color: #F0CC72; -fx-border-radius: 8; -fx-padding: 10 14 10 14;");
-        box.setPadding(new Insets(0, 0, 20, 0));
-        HBox.setHgrow(box, Priority.ALWAYS);
-        return box;
-    }
 
     private Label fieldLabel(String text) {
         Label l = new Label(text.toUpperCase());
@@ -245,13 +239,6 @@ public class LoginScreen {
         return b;
     }
 
-    private Button ghostButton(String text) {
-        Button b = new Button(text);
-        b.setMaxWidth(Double.MAX_VALUE);
-        b.setPrefHeight(38);
-        b.setStyle("-fx-background-color: transparent; -fx-border-color: #C8D4E8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 13px; -fx-text-fill: " + TEXT_MUTED + "; -fx-cursor: hand;");
-        return b;
-    }
 
     private void showStatus(Label lbl, String msg, String textColor, String bgColor) {
         lbl.setText(msg);

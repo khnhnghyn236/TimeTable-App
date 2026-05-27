@@ -4,6 +4,7 @@ bin/
 .projectout/
 out/
 .vscode/
-out/
-.vscode/
-remembered_user.txt
+data/remembered_user.txt
+dependencies/*.zip
+dependencies/**/modules
+dependencies/**/src.zip

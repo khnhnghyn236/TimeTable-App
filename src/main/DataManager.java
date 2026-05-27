@@ -9,18 +9,20 @@ import java.util.List;
 import java.util.Queue;
 
 public class DataManager {
-    private static final String FILE_NAME = "appointments_data.txt";
-    private static final String USERS_FILE_NAME = "users_data.csv";
-    private static final String RESOURCES_FILE_NAME = "resources_data.csv";
+    private static final String FILE_NAME = "data/appointments_data.txt";
+    private static final String USERS_FILE_NAME = "data/users_data.csv";
+    private static final String RESOURCES_FILE_NAME = "data/resources_data.csv";
 
     public static void saveState(List<TimeSlot> slots) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            writer.write("timeRange|resourceName|resourceCapacity|confirmedStudentIds|waitlistStudentIds");
+            writer.write("timeRange|resourceName|resourceCapacity|confirmedStudentIds|waitlistStudentIds|creatorId|creatorName|status|title|slotCapacity");
             writer.newLine();
             for (TimeSlot slot : slots) {
                 writer.write(clean(slot.getTimeRange()) + "|" + clean(slot.getResource().getName()) + "|"
                         + slot.getResource().getCapacity() + "|" + joinStudentIds(slot.getConfirmedStudents())
-                        + "|" + joinStudentIds(slot.getWaitlist()));
+                        + "|" + joinStudentIds(slot.getWaitlist()) + "|"
+                        + clean(slot.getCreatorId()) + "|" + clean(slot.getCreatorName()) + "|"
+                        + clean(slot.getStatus()) + "|" + clean(slot.getTitle()) + "|" + slot.getSlotCapacity());
                 writer.newLine();
             }
             System.out.println("Appointment data saved to " + FILE_NAME);
@@ -54,7 +56,12 @@ public class DataManager {
                     String[] parts = line.split("\\|", -1);
                     if (parts.length >= 3) {
                         Resource res = new Resource(parts[1], Integer.parseInt(parts[2]));
-                        TimeSlot slot = new TimeSlot(parts[0], res);
+                        TimeSlot slot;
+                        if (parts.length >= 10) {
+                            slot = new TimeSlot(parts[0], res, parts[5], parts[6], parts[7], parts[8], Integer.parseInt(parts[9]));
+                        } else {
+                            slot = new TimeSlot(parts[0], res);
+                        }
                         if (parts.length >= 4) loadStudentsIntoSlot(parts[3], users, slot, true);
                         if (parts.length >= 5) loadStudentsIntoSlot(parts[4], users, slot, false);
                         loadedSlots.add(slot);
@@ -190,5 +197,36 @@ public class DataManager {
     private static String clean(String value) {
         if (value == null) return "";
         return value.replace("|", " ").trim();
+    }
+
+    public static void saveNotifications(List<scheduling.Notification> notifications) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("data/notifications_data.txt"))) {
+            pw.println("userId|message|timestamp");
+            for (scheduling.Notification notif : notifications) {
+                pw.println(notif.getUserId() + "|" + notif.getMessage() + "|" + notif.getTime().toString());
+            }
+        } catch (IOException e) {
+            System.err.println("Error saving notifications: " + e.getMessage());
+        }
+    }
+
+    public static List<scheduling.Notification> loadNotifications() {
+        List<scheduling.Notification> list = new ArrayList<>();
+        File file = new File("data/notifications_data.txt");
+        if (!file.exists()) return list;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] parts = line.split("\\|");
+                if (parts.length >= 3) {
+                    list.add(new scheduling.Notification(parts[0], parts[1], java.time.LocalDateTime.parse(parts[2])));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading notifications: " + e.getMessage());
+        }
+        return list;
     }
 }

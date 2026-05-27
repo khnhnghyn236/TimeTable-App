@@ -1,8 +1,0 @@
-role|userId|name|email|passwordHash|approved
-ADMIN|V202502310|Nguyen Hong Khanh|khanh@vinuni.edu|240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9|true
-ADMIN|V202502059|Truong Ba Ky|ky@vinuni.edu|240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9|true
-ADMIN|V202502448|Nguyen Trong Nguyen|nguyen@vinuni.edu|240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9|true
-ADMIN|V202502393|Tran Trong Tai|tai@vinuni.edu|240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9|true
-STAFF|P001|Prof. Bob|bob@vinuni.edu|9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c|true
-ADMIN|A001|Admin Alice|alice@vinuni.edu|240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9|true
-STUDENT|V202502054|Trinh Minh Quang|hjhj@gmail.com|8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92|true

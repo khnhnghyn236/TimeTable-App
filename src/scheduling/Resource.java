@@ -16,4 +16,12 @@ public class Resource {
 	public int getCapacity() {
 		return capacity;
 	}
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
 }

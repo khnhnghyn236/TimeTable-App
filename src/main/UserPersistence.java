@@ -3,7 +3,7 @@ package main;
 import java.io.*;
 
 public class UserPersistence {
-    private static final String REMEMBER_FILE = "remembered_user.txt";
+    private static final String REMEMBER_FILE = "data/remembered_user.txt";
 
     public static void saveRememberedId(String userId) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(REMEMBER_FILE))) {

@@ -1,0 +1,55 @@
+userId|message|timestamp
+B26|Your slot on 2026-05-27 (13:00 - 18:00) was approved.|2026-05-27T05:43:27.618153
+B26|Your slot on 2026-05-28 (07:00 - 08:00) was approved.|2026-05-27T05:43:28.196747700
+B26|Your slot on 2026-05-28 (08:00 - 13:30) was approved.|2026-05-27T05:43:28.622340900
+B26|Your slot on 2026-05-29 (07:30 - 12:30) was approved.|2026-05-27T05:43:29.023440800
+B26|Your slot on 2026-05-30 (07:00 - 11:30) was approved.|2026-05-27T05:43:29.489815900
+B26|📌 Student Huynh Viet Cuong booked your slot: "Meeting 100" on 2026-05-27 (13:00 – 18:00).|2026-05-27T06:15:54.085309800
+B26|📌 Student Huynh Viet Cuong booked your slot: "Meeting 100" on 2026-05-27 (13:00 – 18:00).|2026-05-27T06:16:00.114557500
+B26|📌 Student Huynh Viet Cuong booked your slot: "Meeting 100" on 2026-05-27 (13:00 – 18:00).|2026-05-27T06:16:02.247263400
+B26|📌 Student Huynh Viet Cuong booked your slot: "Meeting 100" on 2026-05-27 (13:00 – 18:00).|2026-05-27T06:16:04.103609300
+B26|📌 Student Huynh Viet Cuong booked your slot: "Meeting 100" on 2026-05-27 (13:00 – 18:00).|2026-05-27T06:16:05.762674400
+B25|📌 Student Huynh Viet Cuong booked your slot: "Meeting" on 2026-05-28 (08:00 – 10:00).|2026-05-27T06:16:16.756326200
+B25|📌 Student Huynh Viet Cuong booked your slot: "Meeting" on 2026-05-28 (08:00 – 10:00).|2026-05-27T06:16:18.931490
+B25|📌 Student Huynh Viet Cuong booked your slot: "Meeting" on 2026-05-28 (08:00 – 10:00).|2026-05-27T06:16:21.079488700
+B25|✅ Your timeslot "Meeting" on 2026-05-28 (07:00 – 08:00) was approved by Admin.|2026-05-27T06:20:32.089952900
+V202502310|New account request from Nguyen Nam Khanh (V24).|2026-05-27T06:28:03.096354500
+V202502059|New account request from Nguyen Nam Khanh (V24).|2026-05-27T06:28:03.097864600
+V202502448|New account request from Nguyen Nam Khanh (V24).|2026-05-27T06:28:03.097864600
+V202502393|New account request from Nguyen Nam Khanh (V24).|2026-05-27T06:28:03.098870500
+A001|New account request from Nguyen Nam Khanh (V24).|2026-05-27T06:28:03.098870500
+V202502310|New account request from Zengchang Qin (B24).|2026-05-27T06:28:35.431237600
+V202502059|New account request from Zengchang Qin (B24).|2026-05-27T06:28:35.432234
+V202502448|New account request from Zengchang Qin (B24).|2026-05-27T06:28:35.433231100
+V202502393|New account request from Zengchang Qin (B24).|2026-05-27T06:28:35.433231100
+A001|New account request from Zengchang Qin (B24).|2026-05-27T06:28:35.434736900
+V202502310|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.868714400
+V202502059|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.869714500
+V202502448|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.869714500
+V202502393|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.869714500
+P001|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.869714500
+A001|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.871218600
+V202502054|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.871218600
+B25|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.872223800
+V25|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.872223800
+B26|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.872223800
+B24|Admin created a new bookable room: Peace Room - I202 (Capacity: 10).|2026-05-27T06:29:24.873223400
+B25|📌 Student Nguyen Nam Khanh booked your slot: "Student Mental Survey" on 2026-05-28 (11:30 – 13:00).|2026-05-27T06:31:54.330128600
+B25|📌 Student Nguyen Nam Khanh booked your slot: "Meeting" on 2026-05-28 (08:00 – 10:00).|2026-05-27T06:31:59.746527
+B26|📌 Student Nguyen Nam Khanh booked your slot: "Meeting 100" on 2026-05-27 (13:00 – 18:00).|2026-05-27T07:03:54.266341200
+B25|📌 Student Nguyen Nam Khanh booked your slot: "Meeting -100" on 2026-05-27 (07:30 – 12:10).|2026-05-27T07:03:57.435828200
+B24|✅ Your timeslot "Meeting" on 2026-05-29 (12:30 – 16:30) was approved by Admin.|2026-05-27T07:05:29.258906800
+B24|✅ Your timeslot "Meeting" on 2026-05-30 (11:30 – 14:00) was approved by Admin.|2026-05-27T07:05:29.829992
+B25|✅ Your timeslot "Meeting" on 2026-05-31 (07:00 – 09:30) was approved by Admin.|2026-05-27T07:05:30.328943800
+B24|✅ Your timeslot "Meeting" on 2026-05-31 (10:30 – 13:30) was approved by Admin.|2026-05-27T07:05:30.811273200
+V202502310|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.536211400
+V202502059|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.538208600
+V202502448|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.539208400
+V202502393|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.540208200
+P001|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.541599300
+A001|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.542604
+V202502054|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.543603700
+B25|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.544604800
+V25|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.544604800
+B26|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.545604
+B24|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.546603500
