@@ -10,7 +10,9 @@ import main.AppSchedulerGUI;
 import scheduling.TimeSlot;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StudentDashboard {
 	private AppSchedulerGUI app;
@@ -103,13 +105,41 @@ public class StudentDashboard {
 		final TimeSlot[] selectedSlot = { null };
 		final HBox[] selectedCard = { null };
 
-		refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl);
+		ComboBox<StaffFilterOption> staffFilter = new ComboBox<>(buildStaffFilterOptions());
+		staffFilter.setPrefWidth(260);
+		staffFilter.setValue(staffFilter.getItems().isEmpty()
+				? StaffFilterOption.allStaff()
+				: staffFilter.getItems().get(0));
+		staffFilter.setCellFactory(param -> new ListCell<StaffFilterOption>() {
+			@Override
+			protected void updateItem(StaffFilterOption item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.toString());
+			}
+		});
+		staffFilter.setButtonCell(new ListCell<StaffFilterOption>() {
+			@Override
+			protected void updateItem(StaffFilterOption item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty || item == null ? null : item.toString());
+			}
+		});
+
+		refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl, staffFilter.getValue());
 
 		ListView<HBox> slotListView = new ListView<>(cardItems);
 		slotListView.setPlaceholder(new Label("No approved slots available yet."));
 		slotListView.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
 		VBox.setVgrow(slotListView, Priority.ALWAYS);
 		slotListView.setSelectionModel(new NoSelectionModel<HBox>());
+
+		staffFilter.setOnAction(e -> {
+			selectedSlot[0] = null;
+			selectedCard[0] = null;
+			statusLbl.setText("");
+			statusLbl.setStyle("");
+			refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl, staffFilter.getValue());
+		});
 
 		Button bookBtn = AppStyles.primaryButton("Book Selected Slot");
 		bookBtn.setPrefHeight(40);
@@ -162,13 +192,17 @@ public class StudentDashboard {
 			// Rebuild cards so spot counts update live
 			selectedSlot[0] = null;
 			selectedCard[0] = null;
-			refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl);
+			refreshStaffFilterOptions(staffFilter);
+			refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl, staffFilter.getValue());
 		});
+
+		HBox filterRow = new HBox(10, new Label("Academic Staff:"), staffFilter);
+		filterRow.setAlignment(Pos.CENTER_LEFT);
 
 		HBox btnRow = new HBox(bookBtn);
 		btnRow.setAlignment(Pos.CENTER_LEFT);
 
-		box.getChildren().addAll(sectionHeader, subHeader, slotListView, statusLbl, btnRow);
+		box.getChildren().addAll(sectionHeader, subHeader, filterRow, slotListView, statusLbl, btnRow);
 		return box;
 	}
 
@@ -177,11 +211,11 @@ public class StudentDashboard {
 	 * reflect live counts.
 	 */
 	private void refreshBookingCards(ObservableList<HBox> cardItems, TimeSlot[] selectedSlot,
-			HBox[] selectedCard, Label statusLbl) {
+			HBox[] selectedCard, Label statusLbl, StaffFilterOption staffFilter) {
 		cardItems.clear();
 		List<TimeSlot> approvedSlots = new ArrayList<>();
 		for (TimeSlot s : app.systemTimeSlots) {
-			if ("APPROVED".equals(s.getStatus()))
+			if ("APPROVED".equals(s.getStatus()) && matchesStaffFilter(s, staffFilter))
 				approvedSlots.add(s);
 		}
 		approvedSlots.sort((a, b) -> {
@@ -191,6 +225,63 @@ public class StudentDashboard {
 		for (TimeSlot slot : approvedSlots) {
 			cardItems.add(buildSlotCard(slot, selectedSlot, selectedCard, cardItems, statusLbl));
 		}
+	}
+
+	private boolean matchesStaffFilter(TimeSlot slot, StaffFilterOption staffFilter) {
+		if (staffFilter == null || staffFilter.isAllStaff())
+			return true;
+		return staffFilter.getCreatorId().equals(slot.getCreatorId());
+	}
+
+	private ObservableList<StaffFilterOption> buildStaffFilterOptions() {
+		ObservableList<StaffFilterOption> options = FXCollections.observableArrayList();
+		options.add(StaffFilterOption.allStaff());
+
+		Map<String, String> staffById = new LinkedHashMap<>();
+		for (TimeSlot slot : app.systemTimeSlots) {
+			if (!"APPROVED".equals(slot.getStatus()))
+				continue;
+			String creatorId = slot.getCreatorId();
+			if (creatorId == null || creatorId.trim().isEmpty())
+				continue;
+			if (!isApprovedAcademicStaff(creatorId))
+				continue;
+			String creatorName = slot.getCreatorName();
+			if (creatorName == null || creatorName.trim().isEmpty())
+				creatorName = "Unknown Staff";
+			staffById.putIfAbsent(creatorId, creatorName);
+		}
+
+		for (Map.Entry<String, String> entry : staffById.entrySet()) {
+			options.add(new StaffFilterOption(entry.getKey(), entry.getValue() + " (" + entry.getKey() + ")"));
+		}
+		return options;
+	}
+
+	private boolean isApprovedAcademicStaff(String creatorId) {
+		for (users.User user : app.allUsers) {
+			if (user instanceof users.AcademicStaff && user.isApproved()
+					&& user.getUserId().equalsIgnoreCase(creatorId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void refreshStaffFilterOptions(ComboBox<StaffFilterOption> staffFilter) {
+		StaffFilterOption selected = staffFilter.getValue();
+		ObservableList<StaffFilterOption> options = buildStaffFilterOptions();
+		staffFilter.setItems(options);
+
+		if (selected != null) {
+			for (StaffFilterOption option : options) {
+				if (option.hasSameCreator(selected)) {
+					staffFilter.setValue(option);
+					return;
+				}
+			}
+		}
+		staffFilter.setValue(options.isEmpty() ? StaffFilterOption.allStaff() : options.get(0));
 	}
 
 	private HBox buildSlotCard(TimeSlot slot, TimeSlot[] selectedSlot, HBox[] selectedCard,
@@ -465,6 +556,42 @@ public class StudentDashboard {
 
 		box.getChildren().addAll(sectionHeader, subHeader, bookingList, btnRow);
 		return box;
+	}
+
+	// Stable dropdown item: display names can change, filtering uses creatorId.
+	private static class StaffFilterOption {
+		private final String creatorId;
+		private final String displayName;
+
+		private StaffFilterOption(String creatorId, String displayName) {
+			this.creatorId = creatorId;
+			this.displayName = displayName;
+		}
+
+		private static StaffFilterOption allStaff() {
+			return new StaffFilterOption(null, "All Academic Staff");
+		}
+
+		private String getCreatorId() {
+			return creatorId;
+		}
+
+		private boolean isAllStaff() {
+			return creatorId == null;
+		}
+
+		private boolean hasSameCreator(StaffFilterOption other) {
+			if (other == null)
+				return false;
+			if (creatorId == null || other.creatorId == null)
+				return creatorId == other.creatorId;
+			return creatorId.equals(other.creatorId);
+		}
+
+		@Override
+		public String toString() {
+			return displayName;
+		}
 	}
 
 	// Suppress default ListView selection highlight - cards handle their own style

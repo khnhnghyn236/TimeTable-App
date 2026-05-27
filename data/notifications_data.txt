@@ -53,3 +53,10 @@ B25|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:1
 V25|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.544604800
 B26|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.545604
 B24|Admin created a new bookable room: DaVinci (Capacity: 4).|2026-05-27T07:17:14.546603500
+V202502310|New account request from Han (v2225).|2026-05-27T11:33:39.926337800
+V202502059|New account request from Han (v2225).|2026-05-27T11:33:39.931654700
+V202502448|New account request from Han (v2225).|2026-05-27T11:33:39.933684600
+V202502393|New account request from Han (v2225).|2026-05-27T11:33:39.934686100
+A001|New account request from Han (v2225).|2026-05-27T11:33:39.936807500
+v2225|🎉 Welcome, Han! Your account has been approved.
+You can now browse available appointment slots under 'Book Appointments', and track your bookings under 'Manage Schedules'.|2026-05-27T11:34:25.225486

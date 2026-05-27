@@ -8,3 +8,8 @@ data/remembered_user.txt
 dependencies/*.zip
 dependencies/**/modules
 dependencies/**/src.zip
+out/
+bin/
+target/
+.vscode/
+remembered_user.txt
