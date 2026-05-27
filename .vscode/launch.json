@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.Main",
+            "projectName": "TimeTable-App-main",
+            "vmArgs": "--module-path \"${workspaceFolder}/dependencies/javafx21/javafx-sdk-21.0.3/lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Run AppSchedulerGUI",
+            "request": "launch",
+            "mainClass": "main.AppSchedulerGUI",
+            "projectName": "TimeTable-App-main",
+            "vmArgs": "--module-path \"${workspaceFolder}/dependencies/javafx21/javafx-sdk-21.0.3/lib\" --add-modules javafx.controls,javafx.fxml"
+        }
+    ]
+}
