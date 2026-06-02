@@ -87,8 +87,10 @@ public class StudentDashboard {
 		return layout;
 	}
 
-	// Tab 1: Booking (card layout matching Faculty's My Timeslots)
+	// --- Tab 1: Booking ---
+	// (card layout matching Faculty's My Timeslots)
 	private VBox createBookingTab() {
+		// STEP 1: Set up main layout for Booking Tab
 		VBox box = new VBox(15);
 		box.setPadding(new Insets(20));
 		box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -105,6 +107,7 @@ public class StudentDashboard {
 		final TimeSlot[] selectedSlot = { null };
 		final HBox[] selectedCard = { null };
 
+		// STEP 2: Initialize filter options for selecting Academic Staff
 		ComboBox<StaffFilterOption> staffFilter = new ComboBox<>(buildStaffFilterOptions());
 		staffFilter.setPrefWidth(260);
 		staffFilter.setValue(staffFilter.getItems().isEmpty()
@@ -127,6 +130,7 @@ public class StudentDashboard {
 
 		refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl, staffFilter.getValue());
 
+		// STEP 3: Setup list view for rendering slot cards
 		ListView<HBox> slotListView = new ListView<>(cardItems);
 		slotListView.setPlaceholder(new Label("No approved slots available yet."));
 		slotListView.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -141,6 +145,7 @@ public class StudentDashboard {
 			refreshBookingCards(cardItems, selectedSlot, selectedCard, statusLbl, staffFilter.getValue());
 		});
 
+		// STEP 4: Define booking logic when a slot is selected and "Book" is clicked
 		Button bookBtn = AppStyles.primaryButton("Book Selected Slot");
 		bookBtn.setPrefHeight(40);
 		bookBtn.setOnAction(e -> {
@@ -376,14 +381,16 @@ public class StudentDashboard {
 				+ "-fx-border-radius: 8; -fx-background-radius: 8; -fx-border-width: 2; -fx-cursor: hand;";
 	}
 
-	// Tab 2: Notifications
+	// --- Tab 2: Notifications ---
 	private VBox createNotificationsTab() {
+		// STEP 1: Set up main layout for Notifications Tab
 		VBox box = new VBox(12);
 		box.setPadding(new Insets(20));
 		box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
 
 		ObservableList<VBox> items = FXCollections.observableArrayList();
 
+		// STEP 2: Filter notifications belonging only to this student
 		List<scheduling.Notification> myNotifs = new ArrayList<>();
 		for (scheduling.Notification n : app.systemNotifications) {
 			if (n.getUserId().equals(app.currentStudent.getUserId()))
@@ -435,8 +442,10 @@ public class StudentDashboard {
 		return card;
 	}
 
-	// Tab 3: Manage Bookings — shows confirmed AND waitlisted slots
+	// --- Tab 3: Manage Bookings ---
+	// shows confirmed AND waitlisted slots
 	private VBox createManageTab() {
+		// STEP 1: Set up main layout for Manage Bookings Tab
 		VBox box = new VBox(15);
 		box.setPadding(new Insets(20));
 		box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -447,6 +456,7 @@ public class StudentDashboard {
 				"Green stripe = confirmed. Amber stripe = on waitlist (auto-promoted when a spot opens).");
 		subHeader.setStyle("-fx-font-size: 12px; -fx-text-fill: " + AppStyles.TEXT_MUTED + ";");
 
+		// STEP 2: Render ListView for the student's bookings and waitlisted slots
 		ListView<TimeSlot> bookingList = new ListView<>(myBookedSlots);
 		bookingList.setPlaceholder(new Label("You have no bookings or waitlisted slots."));
 		bookingList.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -454,7 +464,11 @@ public class StudentDashboard {
 			@Override
 			protected void updateItem(TimeSlot slot, boolean empty) {
 				super.updateItem(slot, empty);
-				if (empty || slot == null) { setText(null); setGraphic(null); return; }
+				if (empty || slot == null) {
+					setText(null);
+					setGraphic(null);
+					return;
+				}
 
 				boolean isConfirmed = slot.getConfirmedStudents().contains(app.currentStudent);
 				boolean isWaitlisted = slot.getWaitlist().contains(app.currentStudent);
@@ -464,7 +478,8 @@ public class StudentDashboard {
 				if (isWaitlisted) {
 					for (users.Student s : slot.getWaitlist()) {
 						waitPos++;
-						if (s.equals(app.currentStudent)) break;
+						if (s.equals(app.currentStudent))
+							break;
 					}
 				}
 
@@ -476,7 +491,9 @@ public class StudentDashboard {
 
 				// Green stripe = confirmed, Amber = waitlisted
 				Label stripe = new Label();
-				stripe.setMinWidth(5); stripe.setPrefWidth(5); stripe.setPrefHeight(60);
+				stripe.setMinWidth(5);
+				stripe.setPrefWidth(5);
+				stripe.setPrefHeight(60);
 				stripe.setStyle("-fx-background-color: "
 						+ (isConfirmed ? AppStyles.STATUS_APPROVED : AppStyles.STATUS_PENDING)
 						+ "; -fx-background-radius: 3;");
@@ -521,6 +538,7 @@ public class StudentDashboard {
 		goBookBtn.setPrefHeight(38);
 		goBookBtn.setOnAction(e -> tabPane.getSelectionModel().select(0));
 
+		// STEP 3: Implement Cancel / Leave Waitlist functionality
 		Button cancelBtn = AppStyles.dangerButton("Cancel / Leave Waitlist");
 		cancelBtn.setPrefHeight(38);
 		cancelBtn.setOnAction(e -> {
@@ -544,9 +562,9 @@ public class StudentDashboard {
 				if (promoted != null) {
 					app.addNotification(promoted.getUserId(),
 							"A spot opened up! You have been moved from the waitlist to confirmed for \""
-							+ selected.getTitle() + "\" on " + selected.getLocalDate()
-							+ " (" + selected.getStartTime() + " - " + selected.getEndTime() + ")."
-							+ " Your booking is now confirmed.");
+									+ selected.getTitle() + "\" on " + selected.getLocalDate()
+									+ " (" + selected.getStartTime() + " - " + selected.getEndTime() + ")."
+									+ " Your booking is now confirmed.");
 				}
 			}
 		});

@@ -14,9 +14,12 @@ public class DataManager {
     private static final String RESOURCES_FILE_NAME = "data/resources_data.csv";
 
     public static void saveState(List<TimeSlot> slots) {
+        // STEP 1: Open writer and output the file header
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             writer.write("timeRange|resourceName|resourceCapacity|confirmedStudentIds|waitlistStudentIds|creatorId|creatorName|status|title|slotCapacity");
             writer.newLine();
+            
+            // STEP 2: Serialize each TimeSlot object into the string format
             for (TimeSlot slot : slots) {
                 writer.write(clean(slot.getTimeRange()) + "|" + clean(slot.getResource().getName()) + "|"
                         + slot.getResource().getCapacity() + "|" + joinStudentIds(slot.getConfirmedStudents())
@@ -40,6 +43,7 @@ public class DataManager {
         File file = new File(FILE_NAME);
         if (!file.exists()) return loadedSlots;
 
+        // STEP 1: Read the appointments file line by line, skipping the header
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             boolean firstLine = true;
@@ -51,12 +55,14 @@ public class DataManager {
                 }
                 firstLine = false;
 
-                // New professional format
+                // STEP 2: Process the new pipe-separated format
                 if (line.contains("|")) {
                     String[] parts = line.split("\\|", -1);
                     if (parts.length >= 3) {
                         Resource res = new Resource(parts[1], Integer.parseInt(parts[2]));
                         TimeSlot slot;
+                        
+                        // STEP 3: Reconstruct the TimeSlot and load student associations
                         if (parts.length >= 10) {
                             slot = new TimeSlot(parts[0], res, parts[5], parts[6], parts[7], parts[8], Integer.parseInt(parts[9]));
                         } else {
@@ -117,9 +123,12 @@ public class DataManager {
     }
 
     public static void saveUsers(List<User> users) {
+        // STEP 1: Open writer and save header for users data
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE_NAME))) {
             writer.write("role|userId|name|email|passwordHash|approved");
             writer.newLine();
+            
+            // STEP 2: Iterate over all users and serialize based on roles
             for (User user : users) {
                 writer.write(getRole(user) + "|" + clean(user.getUserId()) + "|" + clean(user.getName()) + "|" +
                         clean(user.getEmail()) + "|" + user.getPasswordHash() + "|" + user.isApproved());
@@ -135,11 +144,15 @@ public class DataManager {
         List<User> users = new ArrayList<>();
         File file = new File(USERS_FILE_NAME);
         if (!file.exists()) return users;
+        
+        // STEP 1: Parse the user data file, skipping the header line
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|", -1);
                 if (parts.length != 6) continue;
+                
+                // STEP 2: Extract user details and instantiate correct User subclass
                 String role = parts[0], userId = parts[1], name = parts[2], email = parts[3], passwordHash = parts[4];
                 boolean approved = Boolean.parseBoolean(parts[5]);
                 User user = null;

@@ -1,5 +1,5 @@
 timeRange|resourceName|resourceCapacity|confirmedStudentIds|waitlistStudentIds|creatorId|creatorName|status|title|slotCapacity
-2026-05-27   07:30 - 12:10|Library Study Room A|4|||B25|Marc|APPROVED|Meeting -100|20
+2026-05-27   07:30 - 12:10|Library Study Room A|4|V25||B25|Marc|APPROVED|Meeting -100|20
 2026-05-27   13:00 - 18:00|Library Study Room A|4|V25;V25;V25;V25|V25;V24|B26|Anu|APPROVED|Meeting 100|4
 2026-05-28   08:00 - 10:00|Consultation Room B|2|V25|V25;V25;V24|B25|Marc|APPROVED|Meeting|1
 2026-05-28   11:30 - 13:00|Consultation Room B|2|V25;V24||B25|Marc|APPROVED|Student Mental Survey|4
@@ -13,7 +13,11 @@ timeRange|resourceName|resourceCapacity|confirmedStudentIds|waitlistStudentIds|c
 2026-05-29   07:30 - 12:30|Library Study Room A|4|||B26|Anu|APPROVED|Meeting|1
 2026-05-30   09:00 - 12:30|Consultation Room B|2|||B25|Marc|APPROVED|Meeting|1
 2026-05-30   11:30 - 14:00|Library Study Room A|4|||B24|Zengchang Qin|APPROVED|Meeting|1
+2026-05-30   14:30 - 15:00|Library Study Room A|4|||B25|Marc|PENDING|Meeting|1
 2026-05-30   07:00 - 11:30|Library Study Room A|4|||B26|Anu|APPROVED|Meeting|1
 2026-05-31   10:30 - 13:30|Library Study Room A|4|||B24|Zengchang Qin|APPROVED|Meeting|1
-2026-05-31   07:00 - 09:30|Library Study Room A|4|||B25|Marc|APPROVED|Meeting|1
+2026-05-31   07:00 - 09:30|Library Study Room A|4|||B25|Marc|PENDING|Meeting|1
+2026-05-31   13:30 - 15:30|Library Study Room A|4|||B25|Marc|PENDING|Meeting|1
+2026-06-01   07:00 - 11:30|C102|30|V24||B25|Marc|APPROVED|Meeting|2
 2026-06-10   07:00 - 11:30|A117|8|||B25|Marc|APPROVED|Meeting|1
+2026-05-30   14:00 - 14:30|Library Study Room A|4|||B25|Marc|PENDING|Meeting|1

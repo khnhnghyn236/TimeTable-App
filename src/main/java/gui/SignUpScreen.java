@@ -15,6 +15,7 @@ public class SignUpScreen {
     public SignUpScreen(AppSchedulerGUI app) { this.app = app; }
 
     public VBox getContent() {
+        // STEP 1: Set up the main layout for the Sign Up Screen
         VBox layout = new VBox(15);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
@@ -23,6 +24,7 @@ public class SignUpScreen {
         Label title = new Label("Create an Account");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
+        // STEP 2: Initialize all input fields (Name, ID, Email, Password, Role)
         TextField nameInput = new TextField();
         nameInput.setPromptText("Full Name");
         nameInput.setMaxWidth(280);
@@ -48,6 +50,7 @@ public class SignUpScreen {
         roleBox.setPromptText("Select Role");
         roleBox.setMaxWidth(280);
 
+        // STEP 3: Provide feedback label and action buttons
         Label statusLabel = new Label();
         statusLabel.setWrapText(true);
         statusLabel.setMaxWidth(280);
@@ -58,6 +61,7 @@ public class SignUpScreen {
         Button btnBack = new Button("Back to Login");
         btnBack.setOnAction(e -> app.showLogin());
 
+        // STEP 4: Define the form submission and validation logic
         btnSubmit.setOnAction(e -> {
             String id = idInput.getText().trim();
             String name = nameInput.getText().trim();
@@ -88,12 +92,14 @@ public class SignUpScreen {
                 showError(statusLabel, "Email address already exists."); return;
             }
 
+            // STEP 5: Create the user object based on the selected role
             User newUser = role.equals("Student")
                     ? new Student(id, name, email, pass)
                     : new AcademicStaff(id, name, email, pass);
 
             app.registerNewUser(newUser);
 
+            // STEP 6: Display success message and wait for admin approval
             layout.getChildren().clear();
             Label successTitle = new Label("Thank you for signing up!");
             successTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: green;");

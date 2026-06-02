@@ -45,9 +45,11 @@ public class AppSchedulerGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // STEP 1: Set up the primary application window
         this.window = primaryStage;
         window.setTitle("TimeTable - Appointment Scheduling Platform");
 
+        // STEP 2: Load persisted data (users, resources, appointments, notifications)
         loadUsersFromStorage();
         loadResourcesFromStorage();
         loadAppointmentsFromStorage();
@@ -55,11 +57,13 @@ public class AppSchedulerGUI extends Application {
         syncResourcesFromSlots();
         updateStudentUIList();
 
+        // STEP 3: Display the initial login screen
         showLogin();
         window.show();
     }
 
     private void loadUsersFromStorage() {
+        // STEP 4: Initialize user data and ensure default admins exist
         allUsers = DataManager.loadUsers();
         if (allUsers.isEmpty()) {
             createDefaultUsers();
@@ -150,6 +154,7 @@ public class AppSchedulerGUI extends Application {
     }
 
     public void approveUser(User user) {
+        // STEP 5: Handle user approval logic and send welcome notification
         user.setApproved(true);
         rebuildPendingUsers();
         DataManager.saveUsers(allUsers);
@@ -286,6 +291,7 @@ public class AppSchedulerGUI extends Application {
     }
 
     public void switchScreen(Scene scene) {
+        // STEP 6: Helper method to switch views while maintaining window bounds
         window.setScene(scene);
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
         window.setWidth(bounds.getWidth());

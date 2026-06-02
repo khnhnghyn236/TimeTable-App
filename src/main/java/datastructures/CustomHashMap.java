@@ -29,12 +29,13 @@ public class CustomHashMap<K, V> {
 		return Math.abs(key.hashCode()) % table.length;
 	}
 
-	// O(1) average time complexity for insertion
+	// Insertion: O(n)
 	public void put(K key, V value) {
+		// STEP 1: Compute hash code to find the bucket index
 		int index = getBucketIndex(key);
 		Entry<K, V> head = table[index];
 
-		// Check if key already exists, update value if it does
+		// STEP 2: Check if key already exists, update value if it does
 		Entry<K, V> current = head;
 		while (current != null) {
 			if (current.key.equals(key)) {
@@ -44,16 +45,18 @@ public class CustomHashMap<K, V> {
 			current = current.next;
 		}
 
-		// Insert new entry at the head of the chain
+		// STEP 3: Insert new entry at the head of the chain (collision resolution)
 		table[index] = new Entry<>(key, value, head);
 		size++;
 	}
 
-	// O(1) average time complexity for lookup
+	// Lookup: O(n)
 	public V get(K key) {
+		// STEP 1: Find the bucket corresponding to the hash code
 		int index = getBucketIndex(key);
 		Entry<K, V> current = table[index];
 
+		// STEP 2: Traverse the linked list in the bucket
 		while (current != null) {
 			if (current.key.equals(key)) {
 				return current.value;

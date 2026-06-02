@@ -17,16 +17,18 @@ public class CustomBST<T extends Comparable<T>> {
 		}
 	}
 
-	// O(log n) average time complexity for insertion
+	// Insertion: O(log n)
 	public void insert(T data) {
 		root = insertRec(root, data);
 	}
 
 	private Node insertRec(Node root, T data) {
+		// STEP 1: If the tree is empty, return a new node
 		if (root == null) {
 			root = new Node(data);
 			return root;
 		}
+		// STEP 2: Otherwise, recur down the tree
 		if (data.compareTo(root.data) < 0) {
 			root.left = insertRec(root.left, data);
 		} else if (data.compareTo(root.data) > 0) {
@@ -35,7 +37,7 @@ public class CustomBST<T extends Comparable<T>> {
 		return root;
 	}
 
-	// Retrieves elements in sorted order (In-Order Traversal)
+	// Retrieves elements in sorted order
 	public List<T> getSortedList() {
 		List<T> sortedList = new ArrayList<>();
 		inOrderRec(root, sortedList);
@@ -43,6 +45,7 @@ public class CustomBST<T extends Comparable<T>> {
 	}
 
 	private void inOrderRec(Node root, List<T> list) {
+		// STEP 1: Traverse left, visit node, traverse right (In-Order)
 		if (root != null) {
 			inOrderRec(root.left, list);
 			list.add(root.data);

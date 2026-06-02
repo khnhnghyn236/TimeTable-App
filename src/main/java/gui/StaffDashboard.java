@@ -116,7 +116,9 @@ public class StaffDashboard {
         return layout;
     }
 
+    // --- Grid Tab ---
     private VBox createGridTab() {
+        // STEP 1: Set up main container for Grid Tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(15));
         box.setAlignment(Pos.CENTER);
@@ -138,6 +140,7 @@ public class StaffDashboard {
             gridTab.setContent(createGridTab());
         });
 
+        // STEP 2: Set up navigation controls for week switching
         HBox nav = new HBox(15, prev, weekLabel, next, new Label("Room:"), roomCombo, new Label("Title:"), titleField,
                 new Label("Limit:"), capacitySpinner);
         nav.setAlignment(Pos.CENTER);
@@ -156,6 +159,7 @@ public class StaffDashboard {
             grid.getColumnConstraints().add(cc);
         }
 
+        // STEP 3: Initialize the schedule grid layout
         grid.setOnMouseReleased(e -> {
             long newSlotCount = app.systemTimeSlots.stream()
                     .filter(s -> s.getCreatorId().equals(app.currentStaff.getUserId())
@@ -176,6 +180,7 @@ public class StaffDashboard {
         scroll.setFitToWidth(true);
         VBox.setVgrow(scroll, Priority.ALWAYS);
 
+        // STEP 4: Add a legend for slot status colors
         HBox legend = new HBox(15);
         legend.setAlignment(Pos.CENTER);
         legend.getChildren().addAll(
@@ -266,6 +271,7 @@ public class StaffDashboard {
         }
     }
 
+    // Create merged slot button
     private Button createMergedSlotButton(TimeSlot slot, int span, String currentRoomName) {
         Button btn = new Button();
         btn.setMaxWidth(Double.MAX_VALUE);
@@ -323,6 +329,7 @@ public class StaffDashboard {
         return btn;
     }
 
+    // Create normal slot button
     private Button createSlotButton(LocalDate date, LocalTime time, boolean isPast) {
         Button btn = new Button();
         btn.setMaxWidth(Double.MAX_VALUE);
@@ -361,6 +368,7 @@ public class StaffDashboard {
         return btn;
     }
 
+    // Refresh grid and list --> update the window according to new time slots
     private void refreshGridAndList() {
         gridTab.setContent(createGridTab());
         int selIndex = tabPane.getSelectionModel().getSelectedIndex();
@@ -370,6 +378,7 @@ public class StaffDashboard {
         }
     }
 
+    // Toggle range of time slots --> used when dragging
     private void toggleRange(LocalDate date, LocalTime start, LocalTime end) {
         LocalTime time = start;
         while (time.isBefore(end)) {
@@ -378,6 +387,7 @@ public class StaffDashboard {
         }
     }
 
+    // Toggle single time slot --> used when clicking
     private void toggleSingle(LocalDate date, LocalTime start, LocalTime end) {
         Resource selectedRoom = roomCombo.getValue();
         if (selectedRoom == null)
@@ -417,7 +427,9 @@ public class StaffDashboard {
         main.DataManager.saveState(app.systemTimeSlots);
     }
 
+    // --- Notifications Tab ---
     private VBox createNotifyTab() {
+        // STEP 1: Set up main layout for Notifications tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
         box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -426,6 +438,7 @@ public class StaffDashboard {
 
         javafx.collections.ObservableList<VBox> items = javafx.collections.FXCollections.observableArrayList();
 
+        // STEP 2: Filter system notifications for the current staff member
         java.util.List<scheduling.Notification> myNotifs = new java.util.ArrayList<>();
         for (scheduling.Notification n : app.systemNotifications) {
             if (n.getUserId().equals(app.currentStaff.getUserId())) {
@@ -475,12 +488,15 @@ public class StaffDashboard {
         return box;
     }
 
+    // --- My Timeslots List Tab ---
     private VBox createListTab() {
+        // STEP 1: Set up main layout for List Tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
 
         Label lbl = AppStyles.headerLabel("My Timeslots (List View)");
 
+        // STEP 2: Display list of timeslots created by the staff member
         ListView<HBox> list = new ListView<>();
         for (TimeSlot slot : app.systemTimeSlots) {
             if (slot.getCreatorId().equals(app.currentStaff.getUserId())) {
@@ -504,6 +520,7 @@ public class StaffDashboard {
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
+                // STEP 3: Implement Edit and Delete actions for each timeslot
                 Button editBtn = AppStyles.ghostButton("Edit");
                 editBtn.setOnAction(e -> {
                     javafx.stage.Stage editStage = new javafx.stage.Stage();

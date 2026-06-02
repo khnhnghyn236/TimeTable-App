@@ -48,6 +48,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
     }
 
     private void parseTimeRange() {
+        // STEP 1: Attempt to parse the date and time strings
         try {
             // Handle both "2026-05-26 | 07:30 - 10:30" and "2026-05-27 07:20 - 12:10"
             String[] parts = timeRange.split("\\s*\\|\\s*|\\s{2,}");
@@ -64,7 +65,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
             // Ignore parse errors, handle fallback below
         }
 
-        // Fallback to prevent NullPointerException
+        // STEP 2: Fallback to prevent NullPointerException
         if (this.localDate == null) {
             this.localDate = LocalDate.now();
             this.startTime = LocalTime.of(8, 0);
@@ -145,6 +146,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
     }
 
     public void bookSlot(Student student) {
+        // STEP 1: Check capacity and add to confirmed or waitlist
         if (confirmedStudents.size() < slotCapacity) {
             confirmedStudents.add(student);
             System.out.println("SUCCESS: " + student.getName() + " booked " + timeRange);
@@ -167,6 +169,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
     }
 
     public boolean checkIn(Student student) {
+        // STEP 1: Verify student is confirmed and hasn't checked in yet
         if (confirmedStudents.contains(student) && !checkedInStudents.contains(student)) {
             checkedInStudents.add(student);
             System.out.println("CHECK-IN SUCCESS: " + student.getName() + " has arrived.");
@@ -179,6 +182,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
         System.out.println("\n--- 15 MINUTE GRACE PERIOD EXPIRED ---");
         List<Student> toCancel = new ArrayList<>();
 
+        // STEP 1: Identify all students who did not check in
         for (Student student : confirmedStudents) {
             if (!checkedInStudents.contains(student)) {
                 System.out.println("NO-SHOW DETECTED: " + student.getName());
@@ -186,6 +190,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
             }
         }
 
+        // STEP 2: Cancel their bookings
         for (Student noShow : toCancel) {
             cancelBooking(noShow);
         }
@@ -197,8 +202,10 @@ public class TimeSlot implements Comparable<TimeSlot> {
      * can send them a notification. Returns null if no promotion occurred.
      */
     public Student cancelBooking(Student student) {
+        // STEP 1: Check if the student is in the confirmed list
         if (confirmedStudents.remove(student)) {
             System.out.println("CANCELLED: " + student.getName() + " lost their slot.");
+            // STEP 2: Automatically promote the first student in the waitlist
             if (!waitlist.isEmpty()) {
                 Student nextInLine = waitlist.poll();
                 confirmedStudents.add(nextInLine);
@@ -206,7 +213,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
                 return nextInLine;
             }
         } else {
-            // Student is on the waitlist — just remove them
+            // STEP 3: Handle the case where the student is only on the waitlist
             waitlist.remove(student);
             System.out.println("WAITLIST REMOVE: " + student.getName() + " left the waitlist.");
         }

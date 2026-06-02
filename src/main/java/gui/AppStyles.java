@@ -18,12 +18,14 @@ public class AppStyles {
     public static final String ERROR_RED = "#EF4444";
     public static final String WARN_BG = "#FEF3C7";
 
+    // STEP 1: Define shared text styles
     public static Label headerLabel(String text) {
         Label l = new Label(text);
         l.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         return l;
     }
 
+    // STEP 2: Define shared button styles
     public static Button ghostButton(String text) {
         Button b = new Button(text);
         b.setStyle("-fx-background-color: transparent; -fx-border-color: " + STATUS_DEFAULT + "; -fx-border-radius: 4; -fx-cursor: hand;");
@@ -48,6 +50,7 @@ public class AppStyles {
         return b;
     }
 
+    // STEP 3: Define utility method for fading status messages
     public static void showStatus(Label lbl, String msg, String textColor, String bgColor) {
         lbl.setText(msg);
         lbl.setStyle("-fx-font-size: 13px; -fx-text-fill: " + textColor + "; -fx-background-color: " + bgColor + "; -fx-background-radius: 6; -fx-padding: 8 12 8 12;");

@@ -27,7 +27,8 @@ public class AdminDashboard {
         VBox layout = new VBox(0);
         layout.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
 
-        // --- Header bar matching LoginScreen sidebar style ---
+        // --- Header bar ---
+        // This matching LoginScreen sidebar style
         HBox header = new HBox();
         header.setPadding(new Insets(16, 28, 16, 28));
         header.setAlignment(Pos.CENTER_LEFT);
@@ -86,7 +87,9 @@ public class AdminDashboard {
         return layout;
     }
 
+    // --- Room Management Tab ---
     private VBox createResourceTab() {
+        // STEP 1: Set up the main layout container for the Room Management tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
         box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -94,6 +97,7 @@ public class AdminDashboard {
         Label header = new Label("Create and manage bookable campus rooms:");
         header.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1A1A2E;");
 
+        // STEP 2: Create input fields for adding new rooms (Name and Capacity)
         TextField resourceNameInput = new TextField();
         resourceNameInput.setPromptText("Room name, e.g., Library Study Room B");
         resourceNameInput.setStyle("-fx-background-color: " + AppStyles.WHITE
@@ -110,6 +114,7 @@ public class AdminDashboard {
         Label statusLabel = new Label();
         statusLabel.setWrapText(true);
 
+        // STEP 3: Set up the list view to display existing resources/rooms
         resourceList = new ListView<>(app.resourceCatalog);
         resourceList.setPlaceholder(new Label("No room has been created yet."));
         resourceList.setStyle("-fx-background-color: " + AppStyles.WHITE + "; -fx-border-color: #E2E8F0;");
@@ -134,6 +139,7 @@ public class AdminDashboard {
                     Region sp = new Region();
                     HBox.setHgrow(sp, Priority.ALWAYS);
 
+                    // STEP 4: Define Edit functionality for modifying existing room details
                     Button editBtn = AppStyles.ghostButton("Edit");
                     editBtn.setOnAction(e -> {
                         TextInputDialog dialog = new TextInputDialog(resource.getName() + "," + resource.getCapacity());
@@ -162,6 +168,7 @@ public class AdminDashboard {
                         });
                     });
 
+                    // STEP 5: Define Delete functionality for removing a room from the catalog
                     Button delBtn = AppStyles.dangerButton("Delete");
                     delBtn.setOnAction(e -> {
                         if (app.confirmAction("Delete Room",
@@ -180,6 +187,7 @@ public class AdminDashboard {
         });
         VBox.setVgrow(resourceList, Priority.ALWAYS);
 
+        // STEP 6: Define behavior for creating a new room, including validation logic
         createBtn.setOnAction(e -> {
             try {
                 String name = resourceNameInput.getText().trim();
@@ -228,7 +236,9 @@ public class AdminDashboard {
         return box;
     }
 
+    // --- Schedule Approvals Tab ---
     private VBox createScheduleTab() {
+        // STEP 1: Set up the main layout container for the Schedule Approvals tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
         box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -236,6 +246,8 @@ public class AdminDashboard {
         Label reqTitle = new Label("Manage Faculty Timeslot Requests:");
         reqTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1A1A2E;");
 
+        // STEP 2: Initialize ListView to display pending and processed timeslot
+        // requests
         scheduleList = new ListView<>();
         scheduleList.setPlaceholder(new Label("No pending timeslot requests."));
         scheduleList.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -282,6 +294,7 @@ public class AdminDashboard {
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
+                // STEP 3: Implement action buttons for Approve, Decline, and Delete
                 Button approveBtn = AppStyles.successButton("Approve");
                 approveBtn.setOnAction(e -> {
                     slot.setStatus("APPROVED");
@@ -329,6 +342,7 @@ public class AdminDashboard {
         return box;
     }
 
+    // Update schedule list
     private void updateScheduleList() {
         List<TimeSlot> sorted = app.systemTimeSlots.stream()
                 .sorted((a, b) -> {
@@ -342,7 +356,9 @@ public class AdminDashboard {
         scheduleList.setItems(FXCollections.observableArrayList(sorted));
     }
 
+    // --- Account Requests Tab ---
     private VBox createRequestTab() {
+        // STEP 1: Set up main layout for Account Requests tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
         box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -350,6 +366,7 @@ public class AdminDashboard {
         Label reqTitle = new Label("Pending Account Approvals:");
         reqTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1A1A2E;");
 
+        // STEP 2: Initialize ListView for pending user accounts
         ListView<User> requestList = new ListView<>(app.pendingUsers);
         requestList.setPlaceholder(new Label("No pending requests at this time."));
         requestList.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
@@ -379,6 +396,7 @@ public class AdminDashboard {
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
+                // STEP 3: Provide Approve and Decline buttons for each pending user
                 Button btnApprove = AppStyles.successButton("Approve");
                 btnApprove.setOnAction(e -> app.approveUser(user));
 
@@ -400,12 +418,15 @@ public class AdminDashboard {
     }
 
     private VBox createNotifyTab() {
+        // STEP 1: Set up main container for Notifications tab
         VBox box = new VBox(15);
         box.setPadding(new Insets(20));
         box.setStyle("-fx-background-color: " + AppStyles.BG_PAGE + ";");
 
         ObservableList<VBox> items = FXCollections.observableArrayList();
 
+        // STEP 2: Filter the system notifications for those belonging to the current
+        // admin
         java.util.List<scheduling.Notification> myNotifs = new java.util.ArrayList<>();
         for (scheduling.Notification n : app.systemNotifications) {
             if (n.getUserId().equals(app.currentAdmin.getUserId())) {
@@ -445,6 +466,7 @@ public class AdminDashboard {
         return box;
     }
 
+    // Build notification card
     private VBox buildNotifCard(scheduling.Notification n) {
         VBox card = new VBox(4);
         card.setPadding(new Insets(10, 14, 10, 14));

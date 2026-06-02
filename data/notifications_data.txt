@@ -58,5 +58,20 @@ V202502059|New account request from Han (v2225).|2026-05-27T11:33:39.931654700
 V202502448|New account request from Han (v2225).|2026-05-27T11:33:39.933684600
 V202502393|New account request from Han (v2225).|2026-05-27T11:33:39.934686100
 A001|New account request from Han (v2225).|2026-05-27T11:33:39.936807500
-v2225|🎉 Welcome, Han! Your account has been approved.
-You can now browse available appointment slots under 'Book Appointments', and track your bookings under 'Manage Schedules'.|2026-05-27T11:34:25.225486
+B25|📌 Student Huynh Viet Cuong booked your slot: "Meeting -100" on 2026-05-27 (07:30 – 12:10).|2026-05-28T18:21:32.817319
+V202502310|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.034582200
+V202502059|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.035598100
+V202502448|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.038745100
+V202502393|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.040759600
+P001|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.042036200
+A001|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.044050400
+V202502054|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.046314100
+B25|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.047315400
+V25|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.048313700
+B26|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.049830200
+V24|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.051844300
+B24|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.052845
+v2225|Admin created a new bookable room: C102 (Capacity: 30).|2026-05-28T19:14:54.054854100
+B25|✅ Your timeslot "Meeting" on 2026-06-01 (07:00 – 11:30) was approved by Admin.|2026-05-28T19:16:42.638556300
+B25|📌 Student Huynh Viet Cuong booked your slot: "Meeting" on 2026-06-01 (07:00 – 11:30).|2026-05-28T19:17:21.022618100
+B25|📌 Student Nguyen Nam Khanh booked your slot: "Meeting" on 2026-06-01 (07:00 – 11:30).|2026-05-28T19:20:21.814651300
